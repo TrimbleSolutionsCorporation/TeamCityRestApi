@@ -7,15 +7,17 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TeamcityTypes
+namespace TeamcityRestTypes
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
     /// <summary>
     ///     The tc build.
     /// </summary>
     [Serializable]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class TcBuild
     {
 
@@ -24,13 +26,13 @@ namespace TeamcityTypes
         /// </summary>
         public TcBuild()
         {
-            this.OfficialBuild = "no";
-            this.ChangesData = new List<Change>();
-            this.Tests = new List<TcTest>();
-            this.Problems = new List<TcProblem>();
-            this.Artifacts = new List<Artifact>();
-            this.Properties = new List<BuildProperty>();
-            this.ResultingProperties = new List<BuildProperty>();
+            OfficialBuild = "no";
+            ChangesData = new List<Change>();
+            Tests = new List<TcTest>();
+            Problems = new List<TcProblem>();
+            Artifacts = new List<Artifact>();
+            Properties = new List<BuildProperty>();
+            ResultingProperties = new List<BuildProperty>();
         }
 
         /// <summary>
@@ -219,6 +221,36 @@ namespace TeamcityTypes
         public string Platform { get; set; }
 
         /// <summary>
+        /// Gets or sets the platform.
+        /// </summary>
+        public int PercentComplete { get; set; }
+
+        /// <summary>
+        /// Gets or sets the platform.
+        /// </summary>
+        public bool ProbablyHanging { get; set; }
+
+        /// <summary>
+        /// Gets or sets the platform.
+        /// </summary>
+        public bool Outdated { get; set; }
+
+        /// <summary>
+        /// Gets or sets the platform.
+        /// </summary>
+        public string CurrentStageText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the platform.
+        /// </summary>
+        public int ElapsedSeconds { get; set; }
+
+        /// <summary>
+        /// Gets or sets the platform.
+        /// </summary>
+        public int EstimatedTotalSeconds { get; set; }
+
+        /// <summary>
         /// Gets or sets the configuration.
         /// </summary>
         /// <value>
@@ -297,5 +329,10 @@ namespace TeamcityTypes
         /// The Resulting Properties.
         /// </value>
         public List<BuildProperty> ResultingProperties { get; set; }
+
+        /// <summary>
+        /// debugger display helper
+        /// </summary>
+        private string DebuggerDisplay => $"{Number} : {BuildConfigurationName} : {Status} => {StatusText}";
     }
 }

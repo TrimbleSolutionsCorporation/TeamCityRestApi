@@ -13,17 +13,27 @@ type QueryFailedBuilds = JsonProvider<"""
         },
         {
             "id": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_PinpointFailedTest",
+            "name": "Pinpoint",
             "builds": {
                 "build": [
                     {
                         "id": 15872895,
                         "buildTypeId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_PinpointFailedTest",
-                        "number": "5666",
+                        "number": "5assa666",
                         "status": "FAILURE",
                         "state": "finished",
                         "branchName": "master",
+                        "statusText": "asdasd",
+                        "queuedDate": "20200405T054327+0300",
+                        "startDate": "20200405T080713+0300",
+                        "finishDate": "20200405T081651+0300",
                         "href": "/app/rest/builds/id:15872895",
-                        "webUrl": "http://teamcity/viewLog.html?buildId=15872895&buildTypeId=TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_PinpointFailedTest"
+                        "webUrl": "http://teamcity/viewLog.html?buildId=15872895&buildTypeId=TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_PinpointFailedTest",
+                        "comment": {
+                            "timestamp": "20200903T204319+0300",
+                            "text": "Triggered from TafConsole by buildmaster in R-BUILDAGENT61",
+                            "user": {}
+                        }
                     }
                 ]
             }
@@ -52,6 +62,7 @@ type QueryFailedBuilds = JsonProvider<"""
                         "state": "finished",
                         "branchName": "master",
                         "defaultBranch": true,
+                        "statusText": "asdasd",
                         "href": "/app/rest/builds/id:15224049",
                         "webUrl": "http://teamcity/viewLog.html?buildId=15224049&buildTypeId=FTC_122_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterAnalysisandDesignAnaly"
                     }
@@ -75,6 +86,7 @@ type QueryFailedBuilds = JsonProvider<"""
                         "status": "FAILURE",
                         "state": "finished",
                         "branchName": "master",
+                        "statusText": "asdasd",
                         "defaultBranch": true,
                         "href": "/app/rest/builds/id:15636905",
                         "webUrl": "http://teamcity/viewLog.html?buildId=15636905&buildTypeId=FTC_8932_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterUserInterfaceProperty"
@@ -182,21 +194,29 @@ type AgentDetails = JsonProvider<"""
     "href": "/app/rest/agents/id:39",
     "webUrl": "http://teamcity/agentDetails.html?id=39&agentTypeId=39&realAgentName=agent",
     "enabledInfo": {
-        "status": true,
+        "status": false,
         "comment": {
-            "timestamp": "20181025T132138+0300",
+            "timestamp": "20200803T215811+0300",
+            "text": "Installed VS2019 16.5",
             "user": {
-                "username": "jjh",
-                "name": "as asd",
-                "id": 5,
-                "href": "/app/rest/users/id:5"
+                "username": "buildmaster",
+                "name": "Buildmaster",
+                "id": 6,
+                "href": "/app/rest/users/id:6"
             }
         }
     },
     "authorizedInfo": {
         "status": true,
         "comment": {
-            "timestamp": "20130516T112857+0300"
+            "timestamp": "20200318T154955+0200",
+            "text": "Installed VS2019 16.5",
+            "user": {
+                "username": "user",
+                "name": "Name",
+                "id": 1186,
+                "href": "/app/rest/users/id:1186"
+            }
         }
     },
     "properties": {
@@ -228,18 +248,182 @@ type AgentsResponse = JsonProvider<"""
             "id": 39,
             "name": "agetnt1",
             "typeId": 39,
+            "connected": true,
+            "enabled": false,
+            "authorized": true,
             "href": "/app/rest/agents/id:39",
             "webUrl": "http://teamcity/agentDetails.html?id=39&agentTypeId=39&realAgentName=agetnt1"
         },
         {
-            "id": 72,
-            "name": "agetnt2",
-            "typeId": 72,
-            "href": "/app/rest/agents/id:72",
-            "webUrl": "http://teamcity/agentDetails.html?id=72&agentTypeId=72&realAgentName=agetnt2"
+            "id": 209,
+            "name": "l-buildagent-2",
+            "typeId": 209,
+            "ip": "10.42.64.216",
+            "href": "/app/rest/agents/id:209",
+            "webUrl": "http://teamcity/agentDetails.html?id=209&agentTypeId=209&realAgentName=l-buildagent-2",
+            "pool": {
+                "id": 13,
+                "name": "linux-Osx",
+                "href": "/app/rest/agentPools/id:13"
+            }
         }
     ]
 }""">
+
+type VcsRootDetailsReponse = JsonProvider<"""
+{
+    "id": "TsDailyBranches_InstallersAndCopy_2016andAboveEnvironmentSlimVersions",
+    "name": "2016 and above environment slim versions",
+    "vcsName": "jetbrains.git",
+    "href": "/app/rest/vcs-roots/id:TsDailyBranches_InstallersAndCopy_2016andAboveEnvironmentSlimVersions",
+    "project": {
+        "id": "TeklaStructuresBuilds",
+        "name": "Tekla Structures",
+        "parentProjectId": "_Root",
+        "href": "/app/rest/projects/id:TeklaStructuresBuilds",
+        "webUrl": "http://teamcity/project.html?projectId=TeklaStructuresBuilds"
+    },
+    "properties": {
+        "count": 11,
+        "property": [
+            {
+                "name": "agentCleanFilesPolicy",
+                "value": "ALL_UNTRACKED"
+            },
+            {
+                "name": "agentCleanPolicy",
+                "value": "ALWAYS"
+            },
+            {
+                "name": "authMethod",
+                "value": "TEAMCITY_SSH_KEY"
+            },
+            {
+                "name": "branch",
+                "value": "refs/heads/tc-default"
+            },
+            {
+                "name": "ignoreKnownHosts",
+                "value": "true"
+            },
+            {
+                "name": "submoduleCheckout",
+                "value": "CHECKOUT"
+            },
+            {
+                "name": "teamcity:branchSpec",
+                "value": "+:refs/heads/(201*)"
+            },
+            {
+                "name": "teamcitySshKey",
+                "value": "teamcity-bm"
+            },
+            {
+                "name": "url",
+                "value": "ssh://git@bitbucket.tekla.com:7999/clo/tsenvironmentsslim.git"
+            },
+            {
+                "name": "username",
+                "value": "teamcity"
+            },
+            {
+                "name": "usernameStyle",
+                "value": "NAME"
+            }
+        ]
+    },
+    "vcsRootInstances": {
+        "href": "/app/rest/vcs-root-instances?locator=vcsRoot:(id:TsDailyBranches_InstallersAndCopy_2016andAboveEnvironmentSlimVersions)"
+    }
+}""">
+
+type VcsRootsSingleResponse = JsonProvider<"""
+{
+    "vcs-root": [
+        {
+            "id": "TeklaStructuresExternalComponents_Construsoft_TeklaExtensions_AutomaticSplicin_5",
+            "modificationCheckInterval": 60000000,
+            "href": "/app/rest/vcs-roots/id:TeklaStructuresExternalComponents_Construsoft_TeklaExtensions_AutomaticSplicin_5",
+            "name": "ssh://git@bitbucket.trimble.tools/tsia/automaticsplicingtool.git",
+            "properties": {
+                "count": 3,
+                "property": [
+                    {
+                        "name": "push_url",
+                        "value": "ssh://git@bitbucket.trimble.tools/tsia/automaticsplicingtool.git"
+                    },
+                    {
+                        "name": "teamcitySshKey",
+                        "value": "svc_tekla_structures-etools"
+                    },
+                    {
+                        "name": "url",
+                        "value": "ssh://git@bitbucket.trimble.tools/tsia/automaticsplicingtool.git"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "TeklaStructuresExternalComponents_Construsoft_TeklaExtensions_AutomaticSplicin_5",
+            "href": "/app/rest/vcs-roots/id:TeklaStructuresExternalComponents_Construsoft_TeklaExtensions_AutomaticSplicin_5",
+            "name": "ssh://git@bitbucket.trimble.tools/tsia/automaticsplicingtool.git",
+            "properties": {
+                "count": 3,
+                "property": [
+                    {
+                        "name": "teamcitySshKey",
+                        "value": "svc_tekla_structures-etools"
+                    },
+                    {
+                        "name": "url",
+                        "value": "ssh://git@bitbucket.trimble.tools/tsia/automaticsplicingtool.git"
+                    }
+                ]
+            }
+        },
+        {
+            "id": "TeklaStructuresExternalComponents_Construsoft_TeklaExtensions_ContinuousBeamRe_3",
+            "modificationCheckInterval": 60000000,
+            "properties": {
+                "count": 3,
+                "property": [
+                    {
+                        "name": "push_url",
+                        "value": "ssh://git@bitbucket.trimble.tools/tsia/continuousbeamreinforcement.git"
+                    },
+                    {
+                        "name": "teamcitySshKey",
+                        "value": "svc_tekla_structures-etools"
+                    },
+                    {
+                        "name": "url",
+                        "value": "ssh://git@bitbucket.trimble.tools/tsia/continuousbeamreinforcement.git"
+                    }
+                ]
+            }
+        }
+    ]
+} """>
+
+type VcsRootsResponse = JsonProvider<"""
+{
+"count": 2,
+"href": "/app/rest/vcs-roots?locator=count:2",
+"nextHref": "/app/rest/vcs-roots?locator=count:2,start:2",
+"vcs-root": [
+    {
+        "id": "TsDailyBranches_InstallersAndCopy_2016andAboveEnvironmentSlimVersions",
+        "name": "2016 and above environment slim versions",
+        "href": "/app/rest/vcs-roots/id:TsDailyBranches_InstallersAndCopy_2016andAboveEnvironmentSlimVersions"
+    },
+    {
+        "id": "TsDailyBranches_Win32x642016andAbove_2016andAboveEnvironmentsFastVersions",
+        "name": "2016 and above environments fast versions",
+        "href": "/app/rest/vcs-roots/id:TsDailyBranches_Win32x642016andAbove_2016andAboveEnvironmentsFastVersions"
+    }
+]
+}
+""">
 
 type AllUsersResponse = JsonProvider<""" 
 {
@@ -325,10 +509,473 @@ type BuildTypeResponse = JsonProvider<"""
 {"id":"BatTools_BuildAllExtension","name":"BuildAllExtension","projectName":"Admin BatTeam :: Bat Tools","projectId":"BatTools","href":"/httpAuth/app/rest/buildTypes/id:BatTools_BuildAllExtension","webUrl":"http://teamcity/viewType.html?buildTypeId=BatTools_BuildAllExtension","project":{"id":"BatTools","name":"Bat Tools","parentProjectId":"StructuresDailyBuilds_BatTeamAdmin","description":"Bat tools and plugins","href":"/httpAuth/app/rest/projects/id:BatTools","webUrl":"http://teamcity/project.html?projectId=BatTools"},"vcs-root-entries":{"vcs-root-entry":[{"id":"BatTools_VssonarExtensionGi","vcs-root":{"id":"BatTools_VssonarExtensionGi","name":"VssonarExtensionGit","href":"/httpAuth/app/rest/vcs-roots/id:BatTools_VssonarExtensionGi"},"checkout-rules":""}]},"settings":{"count":16,"property":[{"name":"allowExternalStatus","value":"false"},{"name":"artifactRules","value":"bin\\** => Release.zip"},{"name":"buildNumberCounter","value":"73"},{"name":"buildNumberPattern","value":"%build.counter%"},{"name":"checkoutDirectory"},{"name":"checkoutMode","value":"ON_SERVER"},{"name":"cleanBuild","value":"false"},{"name":"enableHangingBuildsDetection","value":"true"},{"name":"executionTimeoutMin","value":"0"},{"name":"maximumNumberOfBuilds","value":"0"},{"name":"shouldFailBuildIfTestsFailed","value":"true"},{"name":"shouldFailBuildOnAnyErrorMessage","value":"false"},{"name":"shouldFailBuildOnBadExitCode","value":"true"},{"name":"shouldFailBuildOnOOMEOrCrash","value":"true"},{"name":"showDependenciesChanges","value":"false"},{"name":"vcsLabelingBranchFilter","value":"+:<default>"}]},"parameters":{"count":6,"href":"/app/rest/buildTypes/id:BatTools_BuildAllExtension/parameters","property":[{"name":"DisableCrashLogCheck","value":"false"},{"name":"env.SONAR_RUNNER_HOME","value":"C:\\Tekla\\BuildTools\\sonar-runner","own":true},{"name":"PRQ_PATH","value":"%teamcity.build.checkoutDir%\\Prerequisites\\2013\\SetupPrerequisites"},{"name":"system.ProduceCoverage","value":"true","own":true},{"name":"system.sonar.password","value":"zxx2756fb0821b9d8c5775d03cbe80d301b"},{"name":"system.UserSRCDir","value":"%teamcity.build.checkoutDir%","type":{"rawValue":"text display='hidden'"}}]},"steps":{"count":2,"step":[{"id":"RUNNER_100","name":"BuildSolution","type":"VS.Solution","properties":{"property":[{"name":"build-file-path","value":"BuildExtension.msbuild"},{"name":"msbuild_version","value":"12.0"},{"name":"run-platform","value":"x86"},{"name":"teamcity.step.mode","value":"default"},{"name":"toolsVersion","value":"12.0"},{"name":"vs.version","value":"vs2013"}]}},{"id":"RUNNER_788","name":"","type":"RunSonarAnalysis","properties":{"property":[{"name":"env.Platform","value":"AnyCPU"},{"name":"env.SONAR_RUNNER_HOME","value":"c:\\tekla\\buildtools\\sonar-runner"},{"name":"JavaHomeToUse","value":"%teamcity.agent.home.dir%\\jre"},{"name":"PathToUse","value":"%env.SONAR_RUNNER_HOME%\\bin;%teamcity.agent.home.dir%\\jre\\bin;C:\\Program Files (x86)\\Git\\bin;%env.Path%"},{"name":"SonarDB","value":"jdbc:postgresql://sonar:5432/sonar"},{"name":"SonarHost","value":"http://sonar"},{"name":"SonarRunnerPropsToUse","value":"-Xmx1024m"},{"name":"teamcity.step.mode","value":"default"},{"name":"WorkingDirectory","value":"%teamcity.build.checkoutDir%"}]}}]},"features":{"feature":[]},"triggers":{"count":1,"trigger":[{"id":"vcsTrigger","type":"vcsTrigger","properties":{"property":[{"name":"quietPeriodMode","value":"DO_NOT_USE"}]}}]},"snapshot-dependencies":{"snapshot-dependency":[]},"artifact-dependencies":{"artifact-dependency":[]},"agent-requirements":{"count":1,"agent-requirement":[{"id":"system.agent.name","type":"contains","properties":{"property":[{"name":"property-name","value":"system.agent.name"},{"name":"property-value","value":"B-BUILDAGENT2"}]}}]},"builds":{"href":"/httpAuth/app/rest/buildTypes/id:BatTools_BuildAllExtension/builds/"}} """>
 
 type BuildResponse = JsonProvider<"""
-{"count":28,"href":"/httpAuth/app/rest/buildTypes/id:BatTools_BuildAllExtension/builds/","build":[{"id":1884284,"buildTypeId":"BatTools_BuildAllExtension","number":"72.354","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1884284","webUrl":"http://teamcity/viewLog.html?buildId=1884284&buildTypeId=BatTools_BuildAllExtension"},{"id":1884126,"buildTypeId":"BatTools_BuildAllExtension","number":"71","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1884126","webUrl":"http://teamcity/viewLog.html?buildId=1884126&buildTypeId=BatTools_BuildAllExtension"},{"id":1884121,"buildTypeId":"BatTools_BuildAllExtension","number":"70","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1884121","webUrl":"http://teamcity/viewLog.html?buildId=1884121&buildTypeId=BatTools_BuildAllExtension"},{"id":1883948,"buildTypeId":"BatTools_BuildAllExtension","number":"69a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1883948","webUrl":"http://teamcity/viewLog.html?buildId=1883948&buildTypeId=BatTools_BuildAllExtension"},{"id":1874662,"buildTypeId":"BatTools_BuildAllExtension","number":"68a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1874662","webUrl":"http://teamcity/viewLog.html?buildId=1874662&buildTypeId=BatTools_BuildAllExtension"},{"id":1874061,"buildTypeId":"BatTools_BuildAllExtension","number":"67a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1874061","webUrl":"http://teamcity/viewLog.html?buildId=1874061&buildTypeId=BatTools_BuildAllExtension"},{"id":1839966,"buildTypeId":"BatTools_BuildAllExtension","number":"66a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1839966","webUrl":"http://teamcity/viewLog.html?buildId=1839966&buildTypeId=BatTools_BuildAllExtension"},{"id":1839824,"buildTypeId":"BatTools_BuildAllExtension","number":"65a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1839824","webUrl":"http://teamcity/viewLog.html?buildId=1839824&buildTypeId=BatTools_BuildAllExtension"},{"id":1839802,"buildTypeId":"BatTools_BuildAllExtension","number":"64a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1839802","webUrl":"http://teamcity/viewLog.html?buildId=1839802&buildTypeId=BatTools_BuildAllExtension"},{"id":1782937,"buildTypeId":"BatTools_BuildAllExtension","number":"63a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1782937","webUrl":"http://teamcity/viewLog.html?buildId=1782937&buildTypeId=BatTools_BuildAllExtension"},{"id":1782633,"buildTypeId":"BatTools_BuildAllExtension","number":"62a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1782633","webUrl":"http://teamcity/viewLog.html?buildId=1782633&buildTypeId=BatTools_BuildAllExtension"},{"id":1770755,"buildTypeId":"BatTools_BuildAllExtension","number":"61a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1770755","webUrl":"http://teamcity/viewLog.html?buildId=1770755&buildTypeId=BatTools_BuildAllExtension"},{"id":1766488,"buildTypeId":"BatTools_BuildAllExtension","number":"60a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1766488","webUrl":"http://teamcity/viewLog.html?buildId=1766488&buildTypeId=BatTools_BuildAllExtension"},{"id":1765126,"buildTypeId":"BatTools_BuildAllExtension","number":"59a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1765126","webUrl":"http://teamcity/viewLog.html?buildId=1765126&buildTypeId=BatTools_BuildAllExtension"},{"id":1762928,"buildTypeId":"BatTools_BuildAllExtension","number":"58","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1762928","webUrl":"http://teamcity/viewLog.html?buildId=1762928&buildTypeId=BatTools_BuildAllExtension"},{"id":1759246,"buildTypeId":"BatTools_BuildAllExtension","number":"57","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1759246","webUrl":"http://teamcity/viewLog.html?buildId=1759246&buildTypeId=BatTools_BuildAllExtension"},{"id":1758293,"buildTypeId":"BatTools_BuildAllExtension","number":"56","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1758293","webUrl":"http://teamcity/viewLog.html?buildId=1758293&buildTypeId=BatTools_BuildAllExtension"},{"id":1755054,"buildTypeId":"BatTools_BuildAllExtension","number":"55","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1755054","webUrl":"http://teamcity/viewLog.html?buildId=1755054&buildTypeId=BatTools_BuildAllExtension"},{"id":1754574,"buildTypeId":"BatTools_BuildAllExtension","number":"54","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1754574","webUrl":"http://teamcity/viewLog.html?buildId=1754574&buildTypeId=BatTools_BuildAllExtension"},{"id":1753844,"buildTypeId":"BatTools_BuildAllExtension","number":"53","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1753844","webUrl":"http://teamcity/viewLog.html?buildId=1753844&buildTypeId=BatTools_BuildAllExtension"},{"id":1744475,"buildTypeId":"BatTools_BuildAllExtension","number":"52","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1744475","webUrl":"http://teamcity/viewLog.html?buildId=1744475&buildTypeId=BatTools_BuildAllExtension"},{"id":1712522,"buildTypeId":"BatTools_BuildAllExtension","number":"51","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1712522","webUrl":"http://teamcity/viewLog.html?buildId=1712522&buildTypeId=BatTools_BuildAllExtension"},{"id":1708392,"buildTypeId":"BatTools_BuildAllExtension","number":"50","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1708392","webUrl":"http://teamcity/viewLog.html?buildId=1708392&buildTypeId=BatTools_BuildAllExtension"},{"id":1706955,"buildTypeId":"BatTools_BuildAllExtension","number":"49","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1706955","webUrl":"http://teamcity/viewLog.html?buildId=1706955&buildTypeId=BatTools_BuildAllExtension"},{"id":1706275,"buildTypeId":"BatTools_BuildAllExtension","number":"48","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1706275","webUrl":"http://teamcity/viewLog.html?buildId=1706275&buildTypeId=BatTools_BuildAllExtension"},{"id":1690735,"buildTypeId":"BatTools_BuildAllExtension","number":"47","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1690735","webUrl":"http://teamcity/viewLog.html?buildId=1690735&buildTypeId=BatTools_BuildAllExtension"},{"id":1674764,"buildTypeId":"BatTools_BuildAllExtension","number":"46","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1674764","webUrl":"http://teamcity/viewLog.html?buildId=1674764&buildTypeId=BatTools_BuildAllExtension"},{"id":1673575,"buildTypeId":"BatTools_BuildAllExtension","number":"45","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1673575","webUrl":"http://teamcity/viewLog.html?buildId=1673575&buildTypeId=BatTools_BuildAllExtension"}]} """>
+{"count":28,"href":"/httpAuth/app/rest/buildTypes/id:BatTools_BuildAllExtension/builds/","build":[{"id":1884284,"buildType": {
+    "id": "TSChainFast_StructuresWorkBuild_TeklaStructuresX64Release",
+    "name": "x64 Release",
+    "projectName": "Tekla Structures :: Work - Master :: Structures Builds",
+    "projectId": "TSChainFast_StructuresWorkBuild",
+    "href": "/app/rest/buildTypes/id:TSChainFast_StructuresWorkBuild_TeklaStructuresX64Release",
+    "webUrl": "http://teamcity/viewType.html?buildTypeId=TSChainFast_StructuresWorkBuild_TeklaStructuresX64Release"
+},"comment": {
+    "timestamp": "20171117T121119+0200",
+    "text": "remote trigger from bitbucket server : http://stash/projects/TS/repos/structures/branches",
+    "user": {
+        "username": "buildmaster",
+        "name": "Buildmaster",
+        "id": 6,
+        "href": "/app/rest/users/id:6"
+    }
+},"queuedDate": "20171117T121119+0200",
+"startDate": "20171117T121154+0200",
+"finishDate": "20171117T123602+0200","changes": {
+    "href": "/app/rest/changes?locator=build:(id:11609257)"
+},"agent": {
+    "id": 219,
+    "name": "B-BUILDAGENT53",
+    "typeId": 219,
+    "href": "/app/rest/agents/id:219"
+}, "statusText": "asdas", "buildTypeId":"BatTools_BuildAllExtension","number":"72.354","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1884284","webUrl":"http://teamcity/viewLog.html?buildId=1884284&buildTypeId=BatTools_BuildAllExtension"},{"id":1884126,"buildTypeId":"BatTools_BuildAllExtension","number":"71","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1884126","webUrl":"http://teamcity/viewLog.html?buildId=1884126&buildTypeId=BatTools_BuildAllExtension"},{"id":1884121,"buildTypeId":"BatTools_BuildAllExtension","number":"70","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1884121","webUrl":"http://teamcity/viewLog.html?buildId=1884121&buildTypeId=BatTools_BuildAllExtension"},{"id":1883948,"buildTypeId":"BatTools_BuildAllExtension","number":"69a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1883948","webUrl":"http://teamcity/viewLog.html?buildId=1883948&buildTypeId=BatTools_BuildAllExtension"},{"id":1874662,"buildTypeId":"BatTools_BuildAllExtension","number":"68a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1874662","webUrl":"http://teamcity/viewLog.html?buildId=1874662&buildTypeId=BatTools_BuildAllExtension"},{"id":1874061,"buildTypeId":"BatTools_BuildAllExtension","number":"67a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1874061","webUrl":"http://teamcity/viewLog.html?buildId=1874061&buildTypeId=BatTools_BuildAllExtension"},{"id":1839966,"buildTypeId":"BatTools_BuildAllExtension","number":"66a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1839966","webUrl":"http://teamcity/viewLog.html?buildId=1839966&buildTypeId=BatTools_BuildAllExtension"},{"id":1839824,"buildTypeId":"BatTools_BuildAllExtension","number":"65a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1839824","webUrl":"http://teamcity/viewLog.html?buildId=1839824&buildTypeId=BatTools_BuildAllExtension"},{"id":1839802,"buildTypeId":"BatTools_BuildAllExtension","number":"64a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1839802","webUrl":"http://teamcity/viewLog.html?buildId=1839802&buildTypeId=BatTools_BuildAllExtension"},{"id":1782937,"buildTypeId":"BatTools_BuildAllExtension","number":"63a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1782937","webUrl":"http://teamcity/viewLog.html?buildId=1782937&buildTypeId=BatTools_BuildAllExtension"},{"id":1782633,"buildTypeId":"BatTools_BuildAllExtension","number":"62a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1782633","webUrl":"http://teamcity/viewLog.html?buildId=1782633&buildTypeId=BatTools_BuildAllExtension"},{"id":1770755,"buildTypeId":"BatTools_BuildAllExtension","number":"61a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1770755","webUrl":"http://teamcity/viewLog.html?buildId=1770755&buildTypeId=BatTools_BuildAllExtension"},{"id":1766488,"buildTypeId":"BatTools_BuildAllExtension","number":"60a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1766488","webUrl":"http://teamcity/viewLog.html?buildId=1766488&buildTypeId=BatTools_BuildAllExtension"},{"id":1765126,"buildTypeId":"BatTools_BuildAllExtension","number":"59a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1765126","webUrl":"http://teamcity/viewLog.html?buildId=1765126&buildTypeId=BatTools_BuildAllExtension"},{"id":1762928,"buildTypeId":"BatTools_BuildAllExtension","number":"58","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1762928","webUrl":"http://teamcity/viewLog.html?buildId=1762928&buildTypeId=BatTools_BuildAllExtension"},{"id":1759246,"buildTypeId":"BatTools_BuildAllExtension","number":"57","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1759246","webUrl":"http://teamcity/viewLog.html?buildId=1759246&buildTypeId=BatTools_BuildAllExtension"},{"id":1758293,"buildTypeId":"BatTools_BuildAllExtension","number":"56","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1758293","webUrl":"http://teamcity/viewLog.html?buildId=1758293&buildTypeId=BatTools_BuildAllExtension"},{"id":1755054,"buildTypeId":"BatTools_BuildAllExtension","number":"55","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1755054","webUrl":"http://teamcity/viewLog.html?buildId=1755054&buildTypeId=BatTools_BuildAllExtension"},{"id":1754574,"buildTypeId":"BatTools_BuildAllExtension","number":"54","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1754574","webUrl":"http://teamcity/viewLog.html?buildId=1754574&buildTypeId=BatTools_BuildAllExtension"},{"id":1753844,"buildTypeId":"BatTools_BuildAllExtension","number":"53","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1753844","webUrl":"http://teamcity/viewLog.html?buildId=1753844&buildTypeId=BatTools_BuildAllExtension"},{"id":1744475,"buildTypeId":"BatTools_BuildAllExtension","number":"52","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1744475","webUrl":"http://teamcity/viewLog.html?buildId=1744475&buildTypeId=BatTools_BuildAllExtension"},{"id":1712522,"buildTypeId":"BatTools_BuildAllExtension","number":"51","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1712522","webUrl":"http://teamcity/viewLog.html?buildId=1712522&buildTypeId=BatTools_BuildAllExtension"},{"id":1708392,"buildTypeId":"BatTools_BuildAllExtension","number":"50","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1708392","webUrl":"http://teamcity/viewLog.html?buildId=1708392&buildTypeId=BatTools_BuildAllExtension"},{"id":1706955,"buildTypeId":"BatTools_BuildAllExtension","number":"49","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1706955","webUrl":"http://teamcity/viewLog.html?buildId=1706955&buildTypeId=BatTools_BuildAllExtension"},{"id":1706275,"buildTypeId":"BatTools_BuildAllExtension","number":"48","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1706275","webUrl":"http://teamcity/viewLog.html?buildId=1706275&buildTypeId=BatTools_BuildAllExtension"},{"id":1690735,"buildTypeId":"BatTools_BuildAllExtension","number":"47","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1690735","webUrl":"http://teamcity/viewLog.html?buildId=1690735&buildTypeId=BatTools_BuildAllExtension"},{"id":1674764,"buildTypeId":"BatTools_BuildAllExtension","number":"46","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1674764","webUrl":"http://teamcity/viewLog.html?buildId=1674764&buildTypeId=BatTools_BuildAllExtension"},{"id":1673575,"buildTypeId":"BatTools_BuildAllExtension","number":"45","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1673575","webUrl":"http://teamcity/viewLog.html?buildId=1673575&buildTypeId=BatTools_BuildAllExtension"}]} """>
+
+type SingleBuildResponse = JsonProvider<"""
+{
+    "id": 20098734,
+    "buildTypeId": "FTC_6211_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterComponentsCustomcompo",
+    "state": "queued",
+    "branchName": "release/2020_Service_Pack_4",
+    "href": "/httpAuth/app/rest/buildQueue/id:20098734",
+    "webUrl": "http://teamcity/viewQueued.html?itemId=20098734",
+    "queuedDate": "20201021T150048+0300",
+    "state": "asda",
+    "waitReason": "asdasda",
+    "status": "asdas",
+    "buildType": {
+        "id": "FTC_6211_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterComponentsCustomcompo",
+        "name": "FTC_6211",
+        "projectName": "Tekla Structures / Taf / MainVersions / Components / Custom components",
+        "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Components_Customcomponents",
+        "href": "/httpAuth/app/rest/buildTypes/id:FTC_6211_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterComponentsCustomcompo",
+        "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_6211_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterComponentsCustomcompo"
+    },
+    "comment": {
+        "timestamp": "20201025T133043+0200",
+        "text": "Manual - Triggered by   from: http://teamcity/viewLog.html?buildId=20093909",
+        "user": {
+            "username": "buildmaster",
+            "name": "Buildmaster",
+            "id": 6,
+            "href": "/httpAuth/app/rest/users/id:6"
+        }
+    },
+    "agent": {
+        "id": 506,
+        "name": "R-TAF03",
+        "typeId": 390,
+        "href": "/app/rest/agents/id:506",
+        "webUrl": "http://teamcity/agentDetails.html?id=506&agentTypeId=390&realAgentName=R-TAF03"
+    },
+    "startEstimate": "20201025T161704+0200",
+    "percentageComplete": "10",
+    "queuedDate": "20201025T133043+0200",
+    "triggered": {
+        "type": "user",
+        "date": "20201025T133043+0200",
+        "user": {
+            "username": "buildmaster",
+            "name": "Buildmaster",
+            "id": 6,
+            "href": "/httpAuth/app/rest/users/id:6"
+        }
+    },
+    "changes": {
+        "href": "/httpAuth/app/rest/changes?locator=build:(id:20098734)"
+    },
+    "revisions": {
+        "count": 0
+    },
+    "compatibleAgents": {
+        "href": "/httpAuth/app/rest/agents?locator=compatible:(build:(id:20098734))"
+    },
+    "artifacts": {
+        "href": "/httpAuth/app/rest/builds/id:20098734/artifacts/children/"
+    },
+    "properties": {
+        "count": 26,
+        "property": [
+            {
+                "name": "DeepCleanExclusions",
+                "value": "BuildDrop Models",
+                "inherited": true
+            },
+            {
+                "name": "env.MSBUILDDISABLENODERESUSE",
+                "value": "1",
+                "inherited": true
+            },
+            {
+                "name": "env.TAF_BASE_PATH",
+                "value": "e:\\prod\\taf",
+                "inherited": true
+            }
+        ]
+    }
+}
+""">
 
 type QueuedBuildResponse = JsonProvider<"""
-{"count":40,"href":"/httpAuth/app/rest/buildQueue","build":[{"taskId":8709158,"buildTypeId":"TsFast_DebugWin32WithCoverage","state":"queued","branchName":"<default>","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709158","webUrl":"http://teamcity/viewQueued.html?itemId=8709158"},{"buildTypeId":"TeklaStructuresIntegrationTests_WorkWin32DebugCoverage_AnalyseSonarQubeExtension","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8706942","webUrl":"http://teamcity/viewQueued.html?itemId=8706942"},{"taskId":8709367,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64Release_TeklaStructuresDrawingTestSlowe","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709367","webUrl":"http://teamcity/viewQueued.html?itemId=8709367"},{"taskId":8709018,"buildTypeId":"bt9900701","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709018","webUrl":"http://teamcity/viewQueued.html?itemId=8709018"},{"taskId":8709451,"buildTypeId":"TSChainFast_CreateDailyBuild","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709451","webUrl":"http://teamcity/viewQueued.html?itemId=8709451"},{"taskId":8709457,"buildTypeId":"TSChainFast_DailyDebug","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709457","webUrl":"http://teamcity/viewQueued.html?itemId=8709457"},{"taskId":8709458,"buildTypeId":"TSChainFast_CreateWorkWin32TeklaStructuresInstaller","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709458","webUrl":"http://teamcity/viewQueued.html?itemId=8709458"},{"taskId":8709531,"buildTypeId":"TSChainFast_Modelx64Release","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709531","webUrl":"http://teamcity/viewQueued.html?itemId=8709531"},{"taskId":8709529,"buildTypeId":"TSChainFast_Drawingsx64Release","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709529","webUrl":"http://teamcity/viewQueued.html?itemId=8709529"},{"taskId":8709530,"buildTypeId":"TSChainFast_DotNetAppsx64Release","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709530","webUrl":"http://teamcity/viewQueued.html?itemId=8709530"},{"taskId":8709532,"buildTypeId":"TSChainFast_TeklaStructuresx64Release","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709532","webUrl":"http://teamcity/viewQueued.html?itemId=8709532"},{"taskId":8709533,"buildTypeId":"TSChainFast_Dailyx64Release","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709533","webUrl":"http://teamcity/viewQueued.html?itemId=8709533"},{"taskId":8709534,"buildTypeId":"TSChainFast_DeploymentInstallers_CopyWorkX64DailybuildToFarmiAndTsLive","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709534","webUrl":"http://teamcity/viewQueued.html?itemId=8709534"},{"taskId":8709512,"buildTypeId":"TeklaStructuresX64Configuration_DeployAssembliesDebug","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709512","webUrl":"http://teamcity/viewQueued.html?itemId=8709512"},{"taskId":8709515,"buildTypeId":"TSChainFast_ModelDebugx64","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709515","webUrl":"http://teamcity/viewQueued.html?itemId=8709515"},{"taskId":8709513,"buildTypeId":"TSChainFast_Drawingsx64Debug","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709513","webUrl":"http://teamcity/viewQueued.html?itemId=8709513"},{"taskId":8709514,"buildTypeId":"TSChainFast_DotNetAppsx64Debug","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709514","webUrl":"http://teamcity/viewQueued.html?itemId=8709514"},{"taskId":8709516,"buildTypeId":"TSChainFast_TeklaStructuresWinDebug","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709516","webUrl":"http://teamcity/viewQueued.html?itemId=8709516"},{"taskId":8709517,"buildTypeId":"TSChainFast_Dailyx64Debug","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709517","webUrl":"http://teamcity/viewQueued.html?itemId=8709517"},{"taskId":8709526,"buildTypeId":"TSChainFast_TsWin32fast_ModelTester","state":"queued","branchName":"refs/heads/master","defaultBranch":true,"href":"/httpAuth/app/rest/buildQueue/taskId:8709526","webUrl":"http://teamcity/viewQueued.html?itemId=8709526"},{"taskId":8709459,"buildTypeId":"TSChainFast_DeploymentInstallers_CopyWorkWin32InstallersZipsEnvsToAManta","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709459","webUrl":"http://teamcity/viewQueued.html?itemId=8709459"},{"taskId":8709479,"buildTypeId":"TsDailyBranches_Win32x64BugFix_2_TeklaStructuresX64Debug","state":"queued","branchName":"107087-DPMPrinter-jpeg-does-not-appear-correctly-19.1","href":"/httpAuth/app/rest/buildQueue/taskId:8709479","webUrl":"http://teamcity/viewQueued.html?itemId=8709479"},{"taskId":8709480,"buildTypeId":"TsDailyBranches_Win32x64BugFix_2_TeklaStructuresWin32Release","state":"queued","branchName":"107087-DPMPrinter-jpeg-does-not-appear-correctly-19.1","href":"/httpAuth/app/rest/buildQueue/taskId:8709480","webUrl":"http://teamcity/viewQueued.html?itemId=8709480"},{"taskId":8709670,"buildTypeId":"TSChainFast_StructuresWorkBuild_Win32x64Features_ModelTesterWin32Releas","state":"queued","branchName":"107504_fix-Sketch-Cham-parameterisation","href":"/httpAuth/app/rest/buildQueue/taskId:8709670","webUrl":"http://teamcity/viewQueued.html?itemId=8709670"},{"taskId":8709432,"buildTypeId":"TsDailyBranches_Win32x64BugFix_2_TeklaStructuresWin32Release","state":"queued","branchName":"107087-DPMPrinter-jpeg-does-not-appear-correctly-20.1","href":"/httpAuth/app/rest/buildQueue/taskId:8709432","webUrl":"http://teamcity/viewQueued.html?itemId=8709432"},{"taskId":8709556,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresModelComponentTe","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709556","webUrl":"http://teamcity/viewQueued.html?itemId=8709556"},{"taskId":8709577,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresModelTestViewTes","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709577","webUrl":"http://teamcity/viewQueued.html?itemId=8709577"},{"taskId":8709584,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_SlabReinforcementToolTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709584","webUrl":"http://teamcity/viewQueued.html?itemId=8709584"},{"taskId":8709591,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_RebarLayeringMarkerTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709591","webUrl":"http://teamcity/viewQueued.html?itemId=8709591"},{"taskId":8709598,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TaskManagerUnitTests","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709598","webUrl":"http://teamcity/viewQueued.html?itemId=8709598"},{"taskId":8709605,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_ContinuousBeamReinforcementTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709605","webUrl":"http://teamcity/viewQueued.html?itemId=8709605"},{"taskId":8709612,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_ProjectOrganizerTestsCm","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709612","webUrl":"http://teamcity/viewQueued.html?itemId=8709612"},{"taskId":8709619,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_DPMPrinterTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709619","webUrl":"http://teamcity/viewQueued.html?itemId=8709619"},{"taskId":8709626,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresAnalysisTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709626","webUrl":"http://teamcity/viewQueued.html?itemId=8709626"},{"taskId":8709633,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresCatalogTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709633","webUrl":"http://teamcity/viewQueued.html?itemId=8709633"},{"taskId":8709640,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresDialogTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709640","webUrl":"http://teamcity/viewQueued.html?itemId=8709640"},{"taskId":8709647,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresDrawingTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709647","webUrl":"http://teamcity/viewQueued.html?itemId=8709647"},{"taskId":8709654,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresDatatypeTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709654","webUrl":"http://teamcity/viewQueued.html?itemId=8709654"},{"taskId":8709661,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresModelSharedWithHi","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709661","webUrl":"http://teamcity/viewQueued.html?itemId=8709661"},{"taskId":8709668,"buildTypeId":"TeklaStructuresIntegrationTests_WorkX64DebugNew_TeklaStructuresTest","state":"queued","href":"/httpAuth/app/rest/buildQueue/taskId:8709668","webUrl":"http://teamcity/viewQueued.html?itemId=8709668"}]} """>
+{
+"build": [
+    {
+        "id": 20048118,
+        "buildTypeId": "FTC_2561_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterPerformanceCore",
+        "state": "queued",
+        "href": "/app/rest/buildQueue/id:20048118",
+        "waitReason": "asdasda",
+        "branchName": "2020",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048118:0:506",
+        "buildType": {
+            "id": "FTC_2561_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterPerformanceCore",
+            "name": "FTC_2561",
+            "projectName": "Tekla Structures / Taf / MainVersions / Performance / Drawings",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Performance_Drawings",
+            "href": "/app/rest/buildTypes/id:FTC_2561_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterPerformanceCore",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_2561_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterPerformanceCore"
+        },
+        "comment": {
+            "timestamp": "20201022T091723+0300",
+            "text": "PERF RETRIGGER: 2",
+            "user": {}
+        },
+        "queuedDate": "20201022T091723+0300",
+        "startDate": "20210114T094003+0200",
+        "agent": {
+            "id": 506,
+            "name": "R-TAF03",
+            "typeId": 390,
+            "href": "/app/rest/agents/id:506",
+            "webUrl": "http://teamcity/agentDetails.html?id=506&agentTypeId=390&realAgentName=R-TAF03"
+        }
+    },
+    {
+        "id": 20034869,
+        "buildTypeId": "FTC_2189_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterReliabilityInteropera",
+        "state": "queued",
+        "href": "/app/rest/buildQueue/id:20034869",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20034869:0:516",
+        "buildType": {
+            "id": "FTC_2189_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterReliabilityInteropera",
+            "name": "FTC_2189",
+            "projectName": "Tekla Structures / Taf / MainVersions / Reliability / Interoperability",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Reliability_Interoperability",
+            "href": "/app/rest/buildTypes/id:FTC_2189_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterReliabilityInteropera",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_2189_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterReliabilityInteropera"
+        },
+        "queuedDate": "20201021T150048+0300",
+        "agent": {
+            "id": 516,
+            "name": "R-TAF06",
+            "typeId": 400,
+            "href": "/app/rest/agents/id:516",
+            "webUrl": "http://teamcity/agentDetails.html?id=516&agentTypeId=400&realAgentName=R-TAF06"
+        },
+        "running-info": {
+            "percentageComplete": 1,
+            "elapsedSeconds": 2,
+            "estimatedTotalSeconds": 279,
+            "currentStageText": "",
+            "outdated": false,
+            "probablyHanging": false
+        }
+    },
+    {
+        "id": 20012607,
+        "buildTypeId": "Fabsuite_Desktop_X64",
+        "state": "queued",
+        "href": "/app/rest/buildQueue/id:20012607",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20012607",
+        "buildType": {
+            "id": "Fabsuite_Desktop_X64",
+            "name": "Buildx64",
+            "projectName": "Tekla EPM / Desktop",
+            "projectId": "Fabsuite_Desktop",
+            "href": "/app/rest/buildTypes/id:Fabsuite_Desktop_X64",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=Fabsuite_Desktop_X64"
+        },
+        "queuedDate": "20201019T200740+0300"
+    },
+    {
+        "id": 20034518,
+        "buildTypeId": "FTC_20114_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterComponentsCustomcomp",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20034518",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20034518:0:516",
+        "buildType": {
+            "id": "FTC_20114_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterComponentsCustomcomp",
+            "name": "FTC_20114",
+            "projectName": "Tekla Structures / Taf / MainVersions / Components / Custom components",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Components_Customcomponents",
+            "href": "/app/rest/buildTypes/id:FTC_20114_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterComponentsCustomcomp",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_20114_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterComponentsCustomcomp"
+        },
+        "comment": {
+            "timestamp": "20201021T140201+0300",
+            "text": "RETRIGGER: Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "queuedDate": "20201021T140201+0300",
+        "agent": {
+            "id": 516,
+            "name": "R-TAF06",
+            "typeId": 400,
+            "href": "/app/rest/agents/id:516",
+            "webUrl": "http://teamcity/agentDetails.html?id=516&agentTypeId=400&realAgentName=R-TAF06"
+        }
+    },
+    {
+        "id": 20048088,
+        "buildTypeId": "FTC_20086_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCloning",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048088",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048088",
+        "buildType": {
+            "id": "FTC_20086_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCloning",
+            "name": "FTC_20086",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Cloning",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_Cloning",
+            "href": "/app/rest/buildTypes/id:FTC_20086_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCloning",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_20086_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCloning"
+        },
+        "comment": {
+            "timestamp": "20201022T091511+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T102342+0300",
+        "queuedDate": "20201022T091511+0300"
+    },
+    {
+        "id": 20048089,
+        "buildTypeId": "FTC_8208_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCreateOpen",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048089",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048089",
+        "buildType": {
+            "id": "FTC_8208_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCreateOpen",
+            "name": "FTC_8208",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Create, Open",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_CreateOpen",
+            "href": "/app/rest/buildTypes/id:FTC_8208_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCreateOpen",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_8208_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCreateOpen"
+        },
+        "comment": {
+            "timestamp": "20201022T091511+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T102443+0300",
+        "queuedDate": "20201022T091511+0300"
+    },
+    {
+        "id": 20048090,
+        "buildTypeId": "FTC_8083_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCloning",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048090",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048090",
+        "buildType": {
+            "id": "FTC_8083_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCloning",
+            "name": "FTC_8083",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Cloning",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_Cloning",
+            "href": "/app/rest/buildTypes/id:FTC_8083_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCloning",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_8083_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsCloning"
+        },
+        "comment": {
+            "timestamp": "20201022T091512+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T102541+0300",
+        "queuedDate": "20201022T091512+0300"
+    },
+    {
+        "id": 20048091,
+        "buildTypeId": "FTC_8204_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsDimensions",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048091",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048091",
+        "buildType": {
+            "id": "FTC_8204_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsDimensions",
+            "name": "FTC_8204",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Dimensions",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_Dimensions",
+            "href": "/app/rest/buildTypes/id:FTC_8204_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsDimensions",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_8204_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsDimensions"
+        },
+        "comment": {
+            "timestamp": "20201022T091512+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T102659+0300",
+        "queuedDate": "20201022T091512+0300",
+        "startDate": "20201022T091512+0300"
+    },
+    {
+        "id": 20048092,
+        "buildTypeId": "FTC_8665_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsPresentation",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048092",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048092",
+        "number": "asda",
+        "status": "asdas",
+        "buildType": {
+            "id": "FTC_8665_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsPresentation",
+            "name": "FTC_8665",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Presentation",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_Presentation",
+            "href": "/app/rest/buildTypes/id:FTC_8665_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsPresentation",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_8665_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsPresentation"
+        },
+        "comment": {
+            "timestamp": "20201022T091513+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T102712+0300",
+        "queuedDate": "20201022T091513+0300"
+    },
+    {
+        "id": 20048093,
+        "buildTypeId": "FTC_15008_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsMarks",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048093",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048093",
+        "percentageComplete": "100",
+        "number": "10asdas0",
+        "buildType": {
+            "id": "FTC_15008_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsMarks",
+            "name": "FTC_15008",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Marks",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_Marks",
+            "href": "/app/rest/buildTypes/id:FTC_15008_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsMarks",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_15008_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsMarks"
+        },
+        "comment": {
+            "timestamp": "20201022T091513+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T102741+0300",
+        "queuedDate": "20201022T091513+0300"
+    },
+    {
+        "id": 20048094,
+        "buildTypeId": "FTC_8971_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsViews",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048094",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048094",
+        "buildType": {
+            "id": "FTC_8971_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsViews",
+            "name": "FTC_8971",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Views",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_Views",
+            "href": "/app/rest/buildTypes/id:FTC_8971_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsViews",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_8971_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsViews"
+        },
+        "comment": {
+            "timestamp": "20201022T091513+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T102748+0300",
+        "queuedDate": "20201022T091513+0300"
+    },
+    {
+        "id": 20048095,
+        "buildTypeId": "FTC_18005_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsViews",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048095",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048095",
+        "buildType": {
+            "id": "FTC_18005_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsViews",
+            "name": "FTC_18005",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Views",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_Views",
+            "href": "/app/rest/buildTypes/id:FTC_18005_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsViews",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_18005_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsViews"
+        },
+        "comment": {
+            "timestamp": "20201022T091515+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T102952+0300",
+        "queuedDate": "20201022T091515+0300"
+    },
+    {
+        "id": 20048098,
+        "buildTypeId": "FTC_80_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsLayoutTemplates",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048098",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048098",
+        "buildType": {
+            "id": "FTC_80_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsLayoutTemplates",
+            "name": "FTC_80",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Layout / Templates",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_LayoutTemplates",
+            "href": "/app/rest/buildTypes/id:FTC_80_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsLayoutTemplates",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_80_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsLayoutTemplates"
+        },
+        "comment": {
+            "timestamp": "20201022T091515+0300",
+            "text": "Schedule trigger from Taf Dashboard - Optimizing build",
+            "user": {}
+        },
+        "startEstimate": "20201022T103029+0300",
+        "queuedDate": "20201022T091515+0300"
+    },
+    {
+        "id": 20048117,
+        "buildTypeId": "FTC_8556_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsPresentation",
+        "state": "queued",
+        "branchName": "<default>",
+        "href": "/app/rest/buildQueue/id:20048117",
+        "webUrl": "http://teamcity/viewQueued.html?itemId=20048117:0:490",
+        "buildType": {
+            "id": "FTC_8556_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsPresentation",
+            "name": "FTC_8556",
+            "projectName": "Tekla Structures / Taf / MainVersions / Drawings / Presentation",
+            "projectId": "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster_Drawings_Presentation",
+            "href": "/app/rest/buildTypes/id:FTC_8556_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsPresentation",
+            "webUrl": "http://teamcity/viewType.html?buildTypeId=FTC_8556_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterDrawingsPresentation"
+        },
+        "comment": {
+            "timestamp": "20201022T091702+0300",
+            "text": "Triggered from: http://teamcity/viewLog.html?buildId=20047505",
+            "user": {}
+        },
+        "startEstimate": "20201022T105333+0300",
+        "queuedDate": "20201022T091702+0300",
+        "agent": {
+            "id": 490,
+            "name": "ESX-NUNIT27",
+            "typeId": 374,
+            "href": "/app/rest/agents/id:490",
+            "webUrl": "http://teamcity/agentDetails.html?id=490&agentTypeId=374&realAgentName=ESX-NUNIT27"
+        }
+    }
+]
+}
+""">
 
 type TriggerBuildResponse = XmlProvider<""" 
 <build id="9592904"
@@ -364,6 +1011,44 @@ type TriggerBuildResponse = XmlProvider<"""
 </build> """>
 
 
+type TestDetails = JsonProvider<"""
+{
+    "id": "id:9797,build:(id:12676325)",
+    "name": "FTC_2726.EmptyModel",
+    "status": "FAILURE",
+    "duration": 337446,
+    "currentlyInvestigated": true,
+    "currentlyMuted": true,
+    "muted": true,
+    "href": "/app/rest/testOccurrences/id:9797,build:(id:12676325)",
+    "details": "Failed\nThe following error messages were found : \r\n Some macro has failed to run, see log and investigate why macro is failing\r\nhttp:/b-farmiweb/cgi-bin/farmi.cgi?app=latest&version=work-x64&ftc=2726",
+    "test": {
+        "id": "2320430423131597177",
+        "name": "FTC_2726.EmptyModel",
+        "href": "/app/rest/tests/id:2320430423131597177"
+    },
+    "build": {
+        "id": 12676325,
+        "buildTypeId": "FTC_2726_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterMultiuseModelSharing",
+        "number": "124",
+        "status": "FAILURE",
+        "state": "finished",
+        "branchName": "master",
+        "defaultBranch": true,
+        "href": "/app/rest/builds/id:12676325",
+        "webUrl": "http://teamcity/viewLog.html?buildId=12676325&buildTypeId=FTC_2726_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterMultiuseModelSharing"
+    },
+    "firstFailed": {
+        "id": "id:15682,build:(id:12675830)",
+        "name": "FTC_2726.EmptyModel",
+        "status": "FAILURE",
+        "duration": 332912,
+        "currentlyInvestigated": true,
+        "href": "/app/rest/testOccurrences/id:15682,build:(id:12675830)"
+    }
+}
+""">
+
 type TestResponse = JsonProvider<"""
 {
     "count": 1,
@@ -377,6 +1062,12 @@ type TestResponse = JsonProvider<"""
             "muted": true,
             "currentlyMuted": true,
             "currentlyInvestigated": true,
+            "href": "/app/rest/testOccurrences/id:15509,build:(id:12632785)"
+        },
+        {
+            "id": "id:15509,build:(id:12632785)",
+            "name": "FTC_5309.DiagnoseAndRepairNumbering_170_enu_default",
+            "status": "FAILURE",
             "href": "/app/rest/testOccurrences/id:15509,build:(id:12632785)"
         }
     ],
@@ -507,6 +1198,10 @@ type UniqueBuildResponse = JsonProvider<"""
                 "name": "ActualBinDirectory",
                 "value": "bin_release_x64",
                 "inherited": true
+            },
+            {
+                "name": "ActualBinDirectory",
+                "value": "bin_release_x64"
             }
         ]
     },
@@ -530,6 +1225,8 @@ type UniqueBuildResponse = JsonProvider<"""
         ]
     }
 } """>
+
+type BuildTypeResponseProjectRecursive = JsonProvider<"""{"count":15,"href":"/app/rest/buildTypes?locator=affectedProject:%28id:TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan%29","buildType":[{"id":"FTC_122_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalys","name":"FTC_122","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_122_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalys","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_122_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalys"},{"id":"FTC_13_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi","name":"FTC_13","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_13_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_13_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi"},{"id":"FTC_20004_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","name":"FTC_20004","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_20004_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_20004_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal"},{"id":"FTC_20007_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","name":"FTC_20007","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_20007_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_20007_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal"},{"id":"FTC_20012_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","name":"FTC_20012","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_20012_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_20012_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal"},{"id":"FTC_20020_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","name":"FTC_20020","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_20020_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_20020_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal"},{"id":"FTC_20027_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","name":"FTC_20027","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_20027_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_20027_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal"},{"id":"FTC_20072_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","name":"FTC_20072","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_20072_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_20072_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal"},{"id":"FTC_20199_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","name":"FTC_20199","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_20199_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_20199_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnal"},{"id":"FTC_3701_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly","name":"FTC_3701","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_3701_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_3701_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly"},{"id":"FTC_70_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi","name":"FTC_70","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_70_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_70_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi"},{"id":"FTC_71_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi","name":"FTC_71","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:FTC_71_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi","webUrl":"http://teamcity/viewType.html?buildTypeId=FTC_71_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnalysi"},{"id":"NUNIT_13_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly","name":"NUNIT_13","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:NUNIT_13_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly","webUrl":"http://teamcity/viewType.html?buildTypeId=NUNIT_13_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly"},{"id":"NUNIT_70_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly","name":"NUNIT_70","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:NUNIT_70_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly","webUrl":"http://teamcity/viewType.html?buildTypeId=NUNIT_70_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly"},{"id":"NUNIT_71_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly","name":"NUNIT_71","projectName":"Tekla Structures / Taf / Pull requests / Analysis and Design / Analysis and Design","projectId":"TeklaStructuresIntegrationTests_Farmi_PullRequests_AnalysisandDesign_Analysisan","href":"/app/rest/buildTypes/id:NUNIT_71_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly","webUrl":"http://teamcity/viewType.html?buildTypeId=NUNIT_71_TeklaStructuresIntegrationTestsFarmiPullRequestsAnalysisandDesignAnaly"}]}""">
 
 type ChangeUnique = JsonProvider<"""
 {
@@ -631,4 +1328,119 @@ type Changes = JsonProvider<"""
 }
 """>
 
+type TestMetaData = JsonProvider<"""
+{
+    "metadata": {
+        "count": 31,
+        "typedValues": [
+            {
+                "name": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-CpuUsage",
+                "type": "number",
+                "value": "7.406968"
+            },
+            {
+                "name": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-CpuUsage-MONTH-CHANGE-PERCENTAGE",
+                "type": "number",
+                "value": "0.0"
+            },
+            {
+                "name": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-CpuUsage-MONTH-TREND",
+                "type": "text",
+                "value": "NOTAVAILABLE"
+            },
+            {
+                "name": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-CpuUsage-WEEK-CHANGE-PERCENTAGE",
+                "type": "number",
+                "value": "0.0"
+            },
+            {
+                "name": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-CpuUsage-WEEK-TREND",
+                "type": "text",
+                "value": "SAME"
+            },
+            {
+                "name": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-CpuUsage-YEAR-CHANGE-PERCENTAGE",
+                "type": "number",
+                "value": "0.0"
+            },
+            {
+                "name": "teamcity.auto.name:1",
+                "type": "image",
+                "value": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures_perf_package.zip!/FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-history-execution-time.png"
+            },
+            {
+                "name": "teamcity.auto.name:7",
+                "type": "artifact",
+                "value": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures_perf_package.zip!/FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-performance-total-interpolated.png"
+            },
+            {
+                "name": "teamcity.auto.name:8",
+                "type": "image",
+                "value": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures_perf_package.zip!/FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-performance-total.png"
+            },
+            {
+                "name": "teamcity.auto.name:9",
+                "type": "artifact",
+                "value": "FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures_perf_package.zip!/FTC_2553-TeklaStructures.exe-Start-Perf-TeklaStructures-performance-total.png"
+            }
+        ],
+        "default": false
+    }
+}
+""">
 type TestDetailsJson = JsonProvider<"""{"id":"id:503,build:(id:14783632)","name":"FTC_2728.EmptyModel","status":"FAILURE","duration":123466,"muted":true,"currentlyMuted":true,"currentlyInvestigated":true,"href":"/app/rest/testOccurrences/id:503,build:(id:14783632)","details":"Test Generated Incorrect References, Check Diff Report\nThe following error messages were found : \r\n \r\n\r\n\r\n\r\nFTC_2728.EmptyModel Asserts in teklastructures/libapplication/appl_user_model_role.cpp:248 with Message: Could not retrieve current user or model guid\r\nFTC_2728.EmptyModel Asserts in teklastructures/libapplication/appl_user_model_role.cpp:248 with Message: Could not retrieve current user or model guid\r\n See Teamcity artifacts to evalute the generated diff. Build => Artifacts section.","test":{"id":"3917745388714076008","name":"FTC_2728.EmptyModel","href":"/app/rest/tests/id:3917745388714076008"},"mute":{"id":6803,"href":"/app/rest/mutes/id:6803","assignment":{"timestamp":"20190614T140526+0300","text":"TTSD-26111","user":{"username":"jocs","name":"Costa Jorge","id":5,"href":"/app/rest/users/id:5"}},"scope":{"project":{"id":"TeklaStructuresIntegrationTests_Farmi","name":"Taf","parentProjectId":"TeklaStructuresBuilds","href":"/app/rest/projects/id:TeklaStructuresIntegrationTests_Farmi","webUrl":"http://teamcity/project.html?projectId=TeklaStructuresIntegrationTests_Farmi"}},"target":{"tests":{"count":1,"default":false,"test":[{"id":"3917745388714076008","name":"FTC_2728.EmptyModel","href":"/app/rest/tests/id:3917745388714076008"}]}},"resolution":{"type":"whenFixed"}},"build":{"id":14783632,"buildTypeId":"FTC_2728_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterMultiuseModelSharing","number":"803","status":"SUCCESS","state":"finished","branchName":"master","defaultBranch":true,"href":"/app/rest/builds/id:14783632","webUrl":"http://teamcity/viewLog.html?buildId=14783632&buildTypeId=FTC_2728_TeklaStructuresIntegrationTestsFarmiFarmiOnMasterMultiuseModelSharing"},"firstFailed":{"id":"id:484,build:(id:14770049)","name":"FTC_2728.EmptyModel","status":"FAILURE","duration":122905,"muted":true,"currentlyMuted":true,"currentlyInvestigated":true,"href":"/app/rest/testOccurrences/id:484,build:(id:14770049)"}}""">
+type TestMuteDetailsJson = JsonProvider<"""
+{
+    "id": "-351385894798633138",
+    "name": "Work-TAF: NUNIT_59.RebarCatalog_WPF_NunitFusionTestModel",
+    "mutes": {
+        "count": 1,
+        "default": false,
+        "mute": [
+            {
+                "id": 8402,
+                "href": "/app/rest/mutes/id:8402",
+                "assignment": {
+                    "timestamp": "20191217T033420+0200",
+                    "text": "[TTSD-32581],",
+                    "user": {
+                        "username": "jocs",
+                        "name": "Costa Jorge",
+                        "id": 5,
+                        "href": "/app/rest/users/id:5"
+                    }
+                },
+                "scope": {
+                    "project": {
+                        "id": "TeklaStructuresIntegrationTests_Farmi",
+                        "name": "Taf",
+                        "parentProjectId": "TeklaStructuresBuilds",
+                        "href": "/app/rest/projects/id:TeklaStructuresIntegrationTests_Farmi",
+                        "webUrl": "http://teamcity/project.html?projectId=TeklaStructuresIntegrationTests_Farmi"
+                    }
+                },
+                "target": {
+                    "tests": {
+                        "count": 1,
+                        "default": false,
+                        "test": [
+                            {
+                                "id": "-351385894798633138",
+                                "name": "Work-TAF: NUNIT_59.RebarCatalog_WPF_NunitFusionTestModel",
+                                "href": "/app/rest/tests/id:-351385894798633138"
+                            }
+                        ]
+                    }
+                },
+                "resolution": {
+                    "type": "whenFixed"
+                }
+            }
+        ]
+    },
+    "testOccurrences": {
+        "href": "/app/rest/testOccurrences?locator=test:(id:-351385894798633138)",
+        "default": false
+    },
+    "href": "/app/rest/tests/id:-351385894798633138"
+}""">

@@ -7,7 +7,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TeamcityTypes
+using System;
+
+namespace TeamcityRestTypes
 {
     public class MuteDetails
     {
@@ -27,5 +29,10 @@ namespace TeamcityTypes
         /// href for additional processing
         /// </summary>
         public string Href { get; set; }
+
+        /// <summary>
+        /// Timestamp
+        /// </summary>
+        public DateTime TimeStamp { get; set; }
     }
 }

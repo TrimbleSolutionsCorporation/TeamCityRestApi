@@ -6,14 +6,13 @@
 //   The tc build.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace TeamcityRestTypes
 {
-    public class BuildProperty
+    public class TcMetaData
     {
         public string Name { get; set; }
-
+        public string Type { get; set; }
         public string Value { get; set; }
-
-        public bool Inherited { get; set; }
     }
 }

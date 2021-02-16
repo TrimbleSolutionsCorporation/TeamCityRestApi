@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TeamcityTypes
+namespace TeamcityRestTypes
 {
     /// <summary>
     /// The TeamcityConfiguration interface.

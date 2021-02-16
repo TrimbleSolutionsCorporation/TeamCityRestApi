@@ -13,14 +13,14 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace TeamcityRestConnector
 
-open TeamcityTypes
+open TeamcityRestTypes
 open System.IO
 open System
 open System.Net
 open System.Text
 open RestSharp
 open RestSharp.Authenticators
-open System.Collections.Generic
+open System.Threading
 
 type JsonTeamcityConnector() = 
     let mutable sessionCookie = null
@@ -33,6 +33,7 @@ type JsonTeamcityConnector() =
     let GetSessionCookie(userconf : ITeamcityConfiguration) =
         if sessionCookie = null then
             let client = new RestClient(userconf.Hostname)
+            client.Timeout <- 250000
             client.Authenticator <- new HttpBasicAuthenticator(userconf.Username, userconf.Password)
             let request = new RestRequest("/app/rest/users", Method.GET)
             request.RequestFormat <- DataFormat.Json
@@ -53,7 +54,11 @@ type JsonTeamcityConnector() =
         GetSessionCookie(userConf)
         let client = new RestClient(userConf.Hostname)
         let request = new RestRequest(url, methodin)
-        request.AddCookie(sessionCookie.Name, sessionCookie.Value) |> ignore
+        client.Timeout <- 250000
+        if sessionCookie = null then
+            client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
+        else
+            request.AddCookie(sessionCookie.Name, sessionCookie.Value) |> ignore
         request.AddHeader("Origin", "http://teamcity") |> ignore
         data |> Seq.iter (fun elem -> request.AddParameter(elem.Key, elem.Value) |> ignore)
         request.RequestFormat <- DataFormat.Json
@@ -72,8 +77,12 @@ type JsonTeamcityConnector() =
         member this.HttpGetRequest(userConf : ITeamcityConfiguration, url : string) =
             GetSessionCookie(userConf) 
             let client = new RestClient(userConf.Hostname)
+            client.Timeout <- 250000
             let request = new RestRequest(url, Method.GET)
-            request.AddCookie(sessionCookie.Name, sessionCookie.Value) |> ignore
+            if sessionCookie = null then
+                client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
+            else
+                request.AddCookie(sessionCookie.Name, sessionCookie.Value) |> ignore
             request.AddHeader("Accept", "application/xml") |> ignore
             client.Execute(request).Content
 
@@ -111,10 +120,15 @@ type JsonTeamcityConnector() =
 
         member this.HttpPutRequest(userconf : ITeamcityConfiguration, url : string, data : string) =
             let client = new System.Net.WebClient()
-            GetSessionCookie(userconf)
-            let cookie = sprintf "TCSESSIONID=%s" sessionCookie.Value
+            GetSessionCookie(userconf)            
             client.Headers.Add("Origin: http://teamcity") |> ignore
-            client.Headers.Add(HttpRequestHeader.Cookie, cookie) |> ignore
+            if sessionCookie = null then
+                let credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(userconf.Username + ":" + userconf.Password))
+                client.Headers.[HttpRequestHeader.Authorization] <- sprintf "Basic %s" credentials
+            else
+                let cookie = sprintf "TCSESSIONID=%s" sessionCookie.Value
+                client.Headers.Add(HttpRequestHeader.Cookie, cookie) |> ignore
+
             let bytes = Encoding.UTF8.GetBytes(data)
             try
                 client.UploadData(userconf.Hostname + url,"PUT", bytes) |> ignore
@@ -130,8 +144,32 @@ type JsonTeamcityConnector() =
             else
                 reply
 
+        member this.HttpPutXmlContent(userConf : ITeamcityConfiguration, url : string, xmlData : string) =
+            let client = new RestClient(userConf.Hostname)
+            client.Timeout <- 250000
+            client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
+            let request = new RestRequest(url, Method.PUT)
+            request.AddHeader("Accept", "application/xml") |> ignore
+            request.Parameters.Clear()
+            request.AddParameter("application/xml", xmlData, ParameterType.RequestBody) |> ignore
+            let result = client.Execute(request)
+            result
+
+        member this.HttpPutTxtContent(userConf : ITeamcityConfiguration, url : string, txtData : string) =
+            let client = new RestClient(userConf.Hostname)
+            client.Timeout <- 250000
+            client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
+            let request = new RestRequest(url, Method.PUT)
+            request.AddHeader("Origin", "http://teamcity") |> ignore
+            request.AddHeader("Content-Type", "text/plain") |> ignore
+            request.AddHeader("Accept", "*/*") |> ignore
+            request.AddParameter("text/plain", txtData, ParameterType.RequestBody) |> ignore
+            let result = client.Execute(request)
+            result
+
         member this.HttpPostRequestContent(userConf : ITeamcityConfiguration, url : string, data : string) =
             let client = new RestClient(userConf.Hostname)
+            client.Timeout <- 250000
             client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
             let request = new RestRequest(url, Method.POST)
             request.AddHeader("Accept", "application/xml") |> ignore

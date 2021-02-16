@@ -7,7 +7,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TeamcityTypes
+namespace TeamcityRestTypes
 {
     using System;
 
@@ -39,6 +39,8 @@ namespace TeamcityTypes
         ///     Gets or sets the id.
         /// </summary>
         public string Id { get; set; }
+
+        public string ProjectId { get; set; }
 
         /// <summary>
         ///     Gets or sets the name.

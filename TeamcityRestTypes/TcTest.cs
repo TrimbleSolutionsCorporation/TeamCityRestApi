@@ -7,13 +7,21 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace TeamcityTypes
+using System.Collections.Generic;
+
+namespace TeamcityRestTypes
 {
     /// <summary>
     /// TcTest
     /// </summary>
     public class TcTest
     {
+        public TcTest()
+        {
+            MuteInformation = new List<MuteDetails>();
+            MetaInformation = new List<TcMetaData>();
+        }
+
         /// <summary>
         /// Gets or sets the identifier.
         /// </summary>
@@ -77,7 +85,13 @@ namespace TeamcityTypes
         /// <summary>
         /// mute information
         /// </summary>
-        public MuteDetails MuteInformation { get; set; }
+        public List<MuteDetails> MuteInformation { get; set; }
+
+        /// <summary>
+        /// Test Metadata
+        /// </summary>
+        public List<TcMetaData> MetaInformation { get; private set; }
+
         /// <summary>
         /// first build that failure occured
         /// </summary>

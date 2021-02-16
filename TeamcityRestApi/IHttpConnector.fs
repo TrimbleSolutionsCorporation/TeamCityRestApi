@@ -14,7 +14,7 @@
 namespace TeamcityRestConnector
 
 open RestSharp
-open TeamcityTypes
+open TeamcityRestTypes
 
 type IHttpTeamcityConnector = 
   abstract member HttpDeleteRequest : ITeamcityConfiguration * string -> IRestResponse
@@ -24,6 +24,8 @@ type IHttpTeamcityConnector =
   abstract member HttpPutRequest : ITeamcityConfiguration * string * string -> bool
   abstract member HttpPostRequest : ITeamcityConfiguration * string * Map<string, string> -> IRestResponse
   abstract member HttpPostRequestContent : ITeamcityConfiguration * string * string -> IRestResponse
+  abstract member HttpPutXmlContent : ITeamcityConfiguration * string * string -> IRestResponse  
+  abstract member HttpPutTxtContent : ITeamcityConfiguration * string * string -> IRestResponse  
   abstract member HttpPostRequestDic : ITeamcityConfiguration * string * System.Collections.Generic.Dictionary<string, string> -> IRestResponse
   abstract member HttpPutFileContent : ITeamcityConfiguration * url:string * payload:string * node:string -> string
 

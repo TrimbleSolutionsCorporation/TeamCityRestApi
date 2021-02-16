@@ -6,7 +6,7 @@
 //   The tc project.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-namespace TeamcityTypes
+namespace TeamcityRestTypes
 {
     using System;
     using System.Collections.Generic;

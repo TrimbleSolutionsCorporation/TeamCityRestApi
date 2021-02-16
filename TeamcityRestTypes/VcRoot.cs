@@ -8,13 +8,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
+using System.Collections.Generic;
+
 namespace TeamcityRestTypes
 {
     /// <summary>
     /// TcUser
     /// </summary>
-    public class TcUser
+    public class VcRoot
     {
+        public VcRoot()
+        {
+            Properties = new Dictionary<string, string>();
+        }
+
         /// <summary>
         /// Gets or sets the identifier.
         /// </summary>
@@ -37,22 +44,16 @@ namespace TeamcityRestTypes
         /// <value>
         /// The User Name.
         /// </value>
-        public string UserName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Href.
-        /// </summary>
-        /// <value>
-        /// The Href.
-        /// </value>
         public string Href { get; set; }
 
         /// <summary>
-        /// Gets or sets the Email.
+        /// Gets or sets modification interval
         /// </summary>
-        /// <value>
-        /// The Email.
-        /// </value>
-        public string Email { get; set; }
+        public long ModificationCheckInterval { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Dictionary<string, string> Properties { get; }
     }
 }

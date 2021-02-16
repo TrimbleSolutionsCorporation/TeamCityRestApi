@@ -1,7 +1,7 @@
-﻿using TeamcityTypes;
-
-namespace TeamcityRestConnect.Test
+﻿namespace TeamcityRestConnect.Test
 {
+    using TeamcityRestTypes;
+
     public class Configuration : ITeamcityConfiguration
     {
         public string Hostname => "";

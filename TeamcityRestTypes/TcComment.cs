@@ -1,19 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TcBuild.cs" company="">
+// <copyright file="QueueBuild.cs" company="">
 //   
 // </copyright>
 // <summary>
-//   The tc build.
+//   Defines the QueueBuild type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 namespace TeamcityRestTypes
 {
-    public class BuildProperty
+    using System;
+
+    public class TcComment
     {
-        public string Name { get; set; }
+        public string Text { get; set; }
 
-        public string Value { get; set; }
+        public string User { get; set; }
 
-        public bool Inherited { get; set; }
+        public string UserName { get; set; }
+
+        public DateTime TimeStamp { get; set; }
     }
 }

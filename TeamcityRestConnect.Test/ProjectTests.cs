@@ -3,20 +3,18 @@ namespace TeamcityRestConnect.Test
 {
     using NUnit.Framework;
     using TeamcityRestConnector;
-    using TeamcityTypes.Imp;
     using System.Linq;
     using System.Net;
-    using TeamcityTypes;
+    using TeamcityRestTypes;
     using System.Collections.Generic;
     using System;
-    using TeamcityRestTypes.Imp;
-
+    
     [TestFixture]
     public class ProjectTests
     {
         public HttpStatusCode CreateFTCCaseForMasterInTeamcity(List<Tuple<string, string>> categoryNamPairs, ITeamcityConfiguration configuration)
         {
-            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector(), new DownloadRestConnector());
+            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector());
             var projects = restClient.GetAllProjects(configuration, "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster");
 
             foreach (var item in categoryNamPairs)
@@ -52,8 +50,17 @@ namespace TeamcityRestConnect.Test
         public void TestDisableAgent()
         {
             var configuration = new Configuration();
-            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector(), new DownloadRestConnector());
+            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector());
             Assert.That(restClient.DisableAgent(configuration, "395"), Is.True);
+        }
+
+        [Test]
+        public void TestDisableAgentQueue()
+        {
+            var configuration = new Configuration();
+            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector());
+            var builds = restClient.GetQueuedBuilds(configuration);
+            Assert.That(builds, Is.True);
         }
 
 
@@ -72,7 +79,7 @@ namespace TeamcityRestConnect.Test
         public void TestDeleteProject()
         {
             var configuration = new Configuration();
-            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector(), new DownloadRestConnector());
+            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector());
             var projects = restClient.GetAllProjects(configuration, "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster");
 
             foreach (var project in projects.Projects)
