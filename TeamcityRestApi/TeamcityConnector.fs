@@ -1513,7 +1513,9 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         newBuild.QueuedTime <- ParseDate(fullBuildData.QueuedDate)
                         newBuild.StartTime <- ParseDate(fullBuildData.StartDate)
                         newBuild.EndTime <- ParseDate(fullBuildData.FinishDate)
-                        newBuild.Comment <- try fullBuildData.Comment.Text with | _ -> ""
+                        if contentString.Contains("\"comment\":") then
+                            newBuild.Comment <- try fullBuildData.Comment.Text with | _ -> ""
+
                         if contentString.Contains("\"agent\":") then
                             if fullBuildData.Agent.JsonValue.ToString().Contains("\"typeId\":") then
                                 newBuild.AgentId <- string fullBuildData.Agent.TypeId

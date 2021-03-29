@@ -6,9 +6,10 @@
 //   The DownloadRestConnector interface.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace TeamcityTypes
 {
+    using TeamcityRestTypes;
+
     /// <summary>
     /// The DownloadRestConnector interface.
     /// </summary>

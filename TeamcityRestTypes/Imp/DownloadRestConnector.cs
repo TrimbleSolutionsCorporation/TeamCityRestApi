@@ -9,10 +9,13 @@
 
 namespace TeamcityTypes.Imp
 {
-    using System;
-    using System.IO;
     using RestSharp;
     using RestSharp.Authenticators;
+
+    using System;
+    using System.IO;
+
+    using TeamcityRestTypes;
 
     /// <summary>
     /// The download rest connector.
@@ -41,13 +44,17 @@ namespace TeamcityTypes.Imp
                 endFilePath = Path.GetTempFileName();
             }
 
-            var client = new RestClient(config.Hostname);
-            client.Authenticator = new HttpBasicAuthenticator(config.Username, config.Password);
+            var client = new RestClient(config.Hostname)
+            {
+                Authenticator = new HttpBasicAuthenticator(config.Username, config.Password)
+            };
 
             using (FileStream writer = File.OpenWrite(endFilePath))
             {
-                var request = new RestRequest(url);
-                request.ResponseWriter = responseStream => responseStream.CopyTo(writer);
+                var request = new RestRequest(url)
+                {
+                    ResponseWriter = responseStream => responseStream.CopyTo(writer)
+                };
                 client.DownloadData(request);
             }
 
