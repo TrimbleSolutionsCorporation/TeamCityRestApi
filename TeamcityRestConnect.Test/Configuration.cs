@@ -9,5 +9,7 @@
         public string Password => "";
 
         public string Username => "";
+
+        public string Token => "";
     }
 }
