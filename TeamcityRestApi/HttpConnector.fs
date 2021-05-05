@@ -31,7 +31,7 @@ type JsonTeamcityConnector() =
         |> Map.ofSeq
 
     let GetSessionCookie(userconf : ITeamcityConfiguration) =
-        if sessionCookie = null then
+        if sessionCookie = null && userconf.Token = "" then
             let client = new RestClient(userconf.Hostname)
             client.Timeout <- 250000
             if userconf.Token <> "" then

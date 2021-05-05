@@ -855,7 +855,10 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 endFilePath <- Path.GetTempFileName()
 
             let client = new RestClient(conf.Hostname)
-            client.Authenticator <- new HttpBasicAuthenticator(conf.Username, conf.Password)
+            if conf.Token <> "" then
+                client.Authenticator <- new JwtAuthenticator(conf.Token)
+            else
+                client.Authenticator <- new HttpBasicAuthenticator(conf.Username, conf.Password)
 
             use writer = File.OpenWrite(endFilePath)
             let request = new RestRequest(url)
