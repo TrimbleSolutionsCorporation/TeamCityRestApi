@@ -27,6 +27,11 @@ namespace TeamcityRestTypes
         string Password { get; }
 
         /// <summary>
+        /// Token
+        /// </summary>
+        string Token { get; }
+
+        /// <summary>
         ///     Gets the username.
         /// </summary>
         string Username { get; }
