@@ -671,7 +671,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             result.StatusCode = HttpStatusCode.OK || result.StatusCode = HttpStatusCode.NotFound
 
         member this.CreateNewProject(conf:ITeamcityConfiguration, name:string, id:string, parent:string) = 
-            let url = "/httpAuth/app/rest/projects"
+            let url = "/app/rest/projects"
             let content = sprintf "<newProjectDescription name='%s' id='%s'><parentProject locator='id:%s'/></newProjectDescription>" name id parent
             let project = GetProjectsFromReply(httpconnector.HttpPostRequestContent(conf, url, content).Content, conf)
             project.ParentProjectId <- parent
@@ -690,7 +690,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             httpconnector.HttpGetRequest(conf, url)
 
         member this.CreateBuildConfiguration(conf:ITeamcityConfiguration, content:string) = 
-            let url = "/httpAuth/app/rest/buildTypes"
+            let url = "/app/rest/buildTypes"
             httpconnector.HttpPostRequestContent(conf, url, content).StatusCode
 
         member this.TriggerCheckForChanges(conf:ITeamcityConfiguration, vcsRootId:string) = 
@@ -746,7 +746,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             queuedbuilds
             
         member this.TriggerTeamcityBuild(conf:ITeamcityConfiguration, build:TcBuild, branch:string) =
-            let url = "/httpAuth/app/rest/buildQueue"
+            let url = "/app/rest/buildQueue"
             let payload = getPayloadXml(branch, build.BuildTypeId, "remote trigger teamcity configuration : BuildAllUi", "", false)
             httpconnector.HttpPutFileContent(conf, url, payload, "build") |> ignore
 
@@ -774,7 +774,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                                          agentString:string,
                                          attop:bool, 
                                          revision:string) =
-            let url = "/httpAuth/app/rest/buildQueue"
+            let url = "/app/rest/buildQueue"
             let payload = getPayloadWithParametersXml(branch, build, comment,  toMap parameters, agentString, attop, revision)
             let returnData = httpconnector.HttpPutFileContent(conf, url, payload, "build")
             let builData = TriggerBuildResponse.Parse(returnData) 
@@ -803,14 +803,14 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                                                       arguments : System.Collections.Generic.Dictionary<string, string>,
                                                       agentString:string,
                                                       attop:bool) =
-            let url = "/httpAuth/app/rest/buildQueue"
+            let url = "/app/rest/buildQueue"
             let payload = getPayloadWithParametersXml(branch, build.Id, comment, toMap arguments, agentString, attop, "")
             let buildreply = httpconnector.HttpPutFileContent(conf, url, payload, "build")
             if tags <> null && tags.Count > 0 then
                 Thread.Sleep(3000)
                 let data = TriggerBuildResponse.Parse(buildreply)
                 // apply tags
-                let url = sprintf "/httpAuth/app/rest/builds/id:%i/tags" data.Id
+                let url = sprintf "/app/rest/builds/id:%i/tags" data.Id
                 let payload = getTagPayload(tags)
                 httpconnector.HttpPutFileContent(conf, url, payload, "build") |> ignore
 

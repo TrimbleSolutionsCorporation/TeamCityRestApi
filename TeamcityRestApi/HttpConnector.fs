@@ -108,7 +108,7 @@ type JsonTeamcityConnector() =
             req.ContentType <- "application/xml"
             let auth =
                 if userConf.Token <> "" then
-                    "Bearer " + (userConf.Token |> Encoding.UTF8.GetBytes |> Convert.ToBase64String)
+                    "Bearer " + userConf.Token
                 else
                     "Basic " + (userConf.Username + ":" + userConf.Password |> Encoding.UTF8.GetBytes |> Convert.ToBase64String)
 
@@ -140,7 +140,7 @@ type JsonTeamcityConnector() =
             if sessionCookie = null then
                 let credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(userconf.Username + ":" + userconf.Password))
                 if userconf.Token <> "" then
-                    client.Headers.[HttpRequestHeader.Authorization] <- sprintf "Bearer %s" (Convert.ToBase64String(Encoding.ASCII.GetBytes(userconf.Token)))
+                    client.Headers.[HttpRequestHeader.Authorization] <- sprintf "Bearer %s" userconf.Token
                 else
                     client.Headers.[HttpRequestHeader.Authorization] <- sprintf "Basic %s" credentials
             else
