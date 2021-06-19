@@ -90,6 +90,7 @@ type ITeamcityConnector =
   abstract member MoveBuildToTop : ConnectionConfiguration:ITeamcityConfiguration * buildid:string -> bool
   
   abstract member MuteTest : ConnectionConfiguration:ITeamcityConfiguration * scopeId:string * reason:string * resolutionType:MuteResolution * testName:string -> bool
+  abstract member UnMuteTest : ConnectionConfiguration:ITeamcityConfiguration * muteId:string -> string
   abstract member GetAgents : ConnectionConfiguration:ITeamcityConfiguration * bool -> System.Collections.Generic.List<TcAgent>
   abstract member GetAgents : ConnectionConfiguration:ITeamcityConfiguration * bool * bool * bool -> System.Collections.Generic.List<TcAgent>
   abstract member GetAllAgents : ConnectionConfiguration:ITeamcityConfiguration * bool -> System.Collections.Generic.List<TcAgent>
@@ -196,7 +197,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             newqueue.State <- data.State
             newqueue.WebUrl <- data.WebUrl
 
-            if data.PercentageComplete.IsSome then newqueue.CompletePercentage <- data.PercentageComplete.Value
+            if data.PercentageComplete.IsSome then
+                try
+                    newqueue.CompletePercentage <- data.PercentageComplete.Value
+                with
+                | _ -> newqueue.CompletePercentage <- 0
             if data.Number.IsSome then newqueue.Number <- data.Number.Value
             if data.WaitReason.IsSome then newqueue.WaitReason <- data.WaitReason.Value else newqueue.WaitReason <- ""
             if data.Status.IsSome then newqueue.Status <- data.Status.Value
@@ -258,10 +263,10 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                             let muteInfo = MuteDetails()
                             try
                                 if testStr.Contains("\"mute\":") then
-                                    muteInfo.Href <- testDetails.Mute.Href
-                                    muteInfo.Name <- testDetails.Mute.Assignment.User.Name
-                                    muteInfo.UserName <- testDetails.Mute.Assignment.User.Username
-                                    muteInfo.Text <- testDetails.Mute.Assignment.Text
+                                    muteInfo.Href <- try testDetails.Mute.Href with | ex -> ""
+                                    muteInfo.Name <- try testDetails.Mute.Assignment.User.Name with | ex -> ""
+                                    muteInfo.UserName <- try testDetails.Mute.Assignment.User.Username with | ex -> ""
+                                    muteInfo.Text <- try testDetails.Mute.Assignment.Text with | ex -> ""
                                     // "timestamp": "20191217T033420+0200",
                                     muteInfo.TimeStamp <- try DateTime.ParseExact(testDetails.Mute.Assignment.Timestamp.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture) with | _ -> DateTime.Now
 
@@ -270,10 +275,10 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                                     let testMuteDetails = TestMuteDetailsJson.Parse(httpconnector.HttpRequest(conf, testDetails.Test.Href, RestSharp.Method.GET).Content)
                                     if testMuteDetails.Mutes.Count > 0 then
                                         let AddMute(mute:TestMuteDetailsJson.Mute) = 
-                                            muteInfo.Href <- mute.Href
-                                            muteInfo.Name <- mute.Assignment.User.Name
-                                            muteInfo.UserName <- mute.Assignment.User.Username
-                                            muteInfo.Text <- mute.Assignment.Text
+                                            muteInfo.Href <- try mute.Href with | ex -> ""
+                                            muteInfo.Name <- try mute.Assignment.User.Name with | ex -> ""
+                                            muteInfo.UserName <- try mute.Assignment.User.Username with | ex -> ""
+                                            muteInfo.Text <- try mute.Assignment.Text with | ex -> ""
                                             newTest.MuteInformation.Add(muteInfo)
 
                                         testMuteDetails.Mutes.Mute
@@ -664,6 +669,10 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             let payload = getMutePayload(conf.Username, reasonTxt, testName, resolution, scopeId)
             let url = "/app/rest/mutes"
             httpconnector.HttpPostRequestContent(conf, url, payload).StatusCode = HttpStatusCode.OK
+
+        member this.UnMuteTest(conf:ITeamcityConfiguration, muteId:string) = 
+            let url = sprintf "/app/rest/mutes/id:%s" muteId
+            httpconnector.HttpDeleteRequest(conf, url).Content
 
         member this.CancelBuild(conf:ITeamcityConfiguration, buildUrl:string, requeue:bool) = 
             let content = sprintf "<buildCancelRequest comment='Retrigger' readdIntoQueue='false' />"

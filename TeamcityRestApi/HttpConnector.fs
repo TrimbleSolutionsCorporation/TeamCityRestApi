@@ -66,7 +66,7 @@ type JsonTeamcityConnector() =
                 client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
         else
             request.AddCookie(sessionCookie.Name, sessionCookie.Value) |> ignore
-        request.AddHeader("Origin", "http://teamcity") |> ignore
+        request.AddHeader("Origin", userConf.Hostname) |> ignore
         data |> Seq.iter (fun elem -> request.AddParameter(elem.Key, elem.Value) |> ignore)
         request.RequestFormat <- DataFormat.Json
         client.Execute(request)
@@ -136,7 +136,7 @@ type JsonTeamcityConnector() =
         member this.HttpPutRequest(userconf : ITeamcityConfiguration, url : string, data : string) =
             let client = new System.Net.WebClient()
             GetSessionCookie(userconf)            
-            client.Headers.Add("Origin: http://teamcity") |> ignore
+            client.Headers.Add("Origin: " + userconf.Hostname) |> ignore
             if sessionCookie = null then
                 let credentials = Convert.ToBase64String(Encoding.ASCII.GetBytes(userconf.Username + ":" + userconf.Password))
                 if userconf.Token <> "" then
@@ -184,7 +184,7 @@ type JsonTeamcityConnector() =
             else
                 client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
             let request = new RestRequest(url, Method.PUT)
-            request.AddHeader("Origin", "http://teamcity") |> ignore
+            request.AddHeader("Origin", userConf.Hostname) |> ignore
             request.AddHeader("Content-Type", "text/plain") |> ignore
             request.AddHeader("Accept", "*/*") |> ignore
             request.AddParameter("text/plain", txtData, ParameterType.RequestBody) |> ignore
