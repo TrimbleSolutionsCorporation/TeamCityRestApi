@@ -964,7 +964,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             let mutable changeLog = ""
             if getChanges then
                 try
-                    let buildurlchanges = sprintf "/app/rest/changes?locator=build:(id:%s)" id
+                    let buildurlchanges = sprintf "/app/rest/changes?locator=build:(id:%s)&fields=count,change:(id,version,username,date,href,webUrl,files)" id
                     let changesData = Changes.Parse(httpconnector.HttpRequest(conf, buildurlchanges, RestSharp.Method.GET).Content)
           
                     if changesData.Count <> 0 then
@@ -977,6 +977,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                             changedata.Version <- change.Version
                             changedata.WebUrl <- change.WebUrl
                             
+                            if change.Files.Count <> 0 then
+                                let mutable changedfile = ""
+                                for file in change.Files.File do
+                                    changedfile <- file.File
+                                    changedata.ListofChangedFiles.Add(changedfile)
                             let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.GET).Content)
                             changedata.Comment <- change.Comment
                             newBuild.ChangesData.Add(changedata)

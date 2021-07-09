@@ -1313,7 +1313,27 @@ type Changes = JsonProvider<"""
             "username": "tran tu",
             "date": "20180820T074849+0300",
             "href": "/app/rest/changes/id:2776374",
-            "webUrl": "http://teamcity/viewModification.html?modId=2776374&personal=false"
+            "webUrl": "http://teamcity/viewModification.html?modId=2776374&personal=false",
+           "files": 
+               {
+                   "count": 2,
+                   "file": [
+                   {
+                       "before-revision": "8c03520defefebab86595b324c2e74b40f5130e5",
+                       "after-revision": "4988cde8ce25d3e10aab64d96194dad146af045a",
+                       "changeType": "edited",
+                       "file": "Applications/PropertySetDefinitions/Dialogs/PropertySetDialog.Designer.cs",
+                       "relative-file": "Applications/PropertySetDefinitions/Dialogs/PropertySetDialog.Designer.cs"
+                   },
+                   {
+                       "before-revision": "8c03520defefebab86595b324c2e74b40f5130e5",
+                       "after-revision": "4988cde8ce25d3e10aab64d96194dad146af045a",
+                       "changeType": "edited",
+                       "file": "/pplications/PropertySetDefinitions/Dialogs/PropertySetDialog.cs",
+                       "relative-file": "Applications/PropertySetDefinitions/Dialogs/PropertySetDialog.cs"
+                   }
+                  ]
+             }
         },
         {
             "id": 2776373,
@@ -1321,8 +1341,26 @@ type Changes = JsonProvider<"""
             "username": "lauri kosonen",
             "date": "20180817T154631+0300",
             "href": "/app/rest/changes/id:2776373",
-            "webUrl": "http://teamcity/viewModification.html?modId=2776373&personal=false"
-        }
+            "webUrl": "http://teamcity/viewModification.html?modId=2776373&personal=false",
+            "files": { "count": 2,
+            "file": [
+            {
+                "before-revision": "8c67720defefebab86595b324c2e74b40f5130e5",
+                "after-revision": "4945fac8ce25d3e10aab64d96194dad146af045a",
+                "changeType": "edited",
+                "file": "Applications/PropertySetDefinitions/Dialogs/PropertySetDialog.Designer.cs",
+                "relative-file": "Applications/PropertySetDefinitions/Dialogs/PropertySetDialog.Designer.cs"
+            },
+            {
+                "before-revision": "8c67720defefebab86595b324c2e74b40f5130e5",
+                "after-revision": "4945fac8ce25d3e10aab64d96194dad146af045a",
+                "changeType": "edited",
+                "file": "Applications/PropertySetDefinitions/Dialogs/PropertySetDialog.cs",
+                "relative-file": "Applications/PropertySetDefinitions/Dialogs/PropertySetDialog.cs"
+            }
+            ]
+         } 
+      }
     ],
     "href": "/app/rest/changes?locator=build:%28id:12519813%29"
 }
