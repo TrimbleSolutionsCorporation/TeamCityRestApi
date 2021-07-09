@@ -6,6 +6,7 @@
 //   The tc build.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
+using System.Collections.Generic;
 
 namespace TeamcityRestTypes
 {
@@ -69,5 +70,18 @@ namespace TeamcityRestTypes
         /// The comment.
         /// </value>
         public string Comment { get; set; }
+
+        /// <summary>
+        /// Gets or sets the changed files.
+        /// </summary>
+        /// <value>
+        /// The changed files.
+        /// </value>
+        public List<string> ListofChangedFiles { get; set; }
+
+        public Change()
+        {
+            this.ListofChangedFiles = new List<string>();
+        }
     }
 }
