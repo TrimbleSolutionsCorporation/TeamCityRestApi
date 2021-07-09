@@ -6,9 +6,7 @@
 //   The tc build.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
-using System;
 using System.Collections.Generic;
-
 
 namespace TeamcityRestTypes
 {
@@ -85,7 +83,5 @@ namespace TeamcityRestTypes
         {
             this.ListofChangedFiles = new List<string>();
         }
-
-
     }
 }
