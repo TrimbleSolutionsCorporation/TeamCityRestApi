@@ -1711,9 +1711,9 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
             let uiWebRequest =
                 if branch = "master" || branch = "" then
-                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,default:true),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType)" buildConf count lookupLimitLocator
+                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,default:true),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,project,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType)" buildConf count lookupLimitLocator
                 else
-                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType)" branch buildConf count lookupLimitLocator
+                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,project,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType)" branch buildConf count lookupLimitLocator
 
             let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, uiWebRequest, RestSharp.Method.GET).Content)
 
@@ -1730,6 +1730,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         newBuild.StatusText <- build.StatusText.Value
                     newBuild.WebUrl <- build.WebUrl
                     newBuild.Branch <- branch
+                    newBuild.ProjectId <-  build.BuildType.Value.ProjectId
                     if build.QueuedDate.IsSome then
                         newBuild.QueuedTime <- ParseDate(build.QueuedDate.Value)
 

@@ -334,5 +334,13 @@ namespace TeamcityRestTypes
         /// debugger display helper
         /// </summary>
         private string DebuggerDisplay => $"{Number} : {BuildConfigurationName} : {Status} => {StatusText}";
-    }
+
+		/// <summary>
+		/// Gets or sets the ProjectId.
+		/// </summary>
+		/// <value>
+		/// The Project Id.
+		/// </value>
+		public string ProjectId { get; set; }
+	}
 }
