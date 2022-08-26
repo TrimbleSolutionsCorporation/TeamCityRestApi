@@ -4,12 +4,12 @@
 
     public class Configuration : ITeamcityConfiguration
     {
-        public string Hostname => "";
+        public string Hostname { get; set; } = "";
 
-        public string Password => "";
+        public string Password { get; set; } = "";
 
-        public string Username => "";
+        public string Username { get; set; } = "";
 
-        public string Token => "";
+        public string Token { get; set; } = "";
     }
 }

@@ -87,5 +87,26 @@ namespace TeamcityRestConnect.Test
                 Assert.True(restClient.DeleteProject(configuration, project.Id));
             }
         }
+
+        [Test]
+        public void MigrateUsers()
+        {
+            var configuration = new Configuration();
+            configuration.Hostname = "https://teamcity.teklaad.tekla.com";
+            configuration.Username = "";
+            configuration.Password = "";
+            configuration.Token = "";
+            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector());
+            var users = restClient.GetAllUsers(configuration);
+
+            foreach (var user in users)
+            {
+                if (!user.Email.ToLower().Contains("buildmaster"))
+                {
+                    var result = restClient.UpdateUserLogin(configuration, user, user.Email.ToLower());
+                    Console.WriteLine(result);
+                }
+            }
+        }
     }
 }

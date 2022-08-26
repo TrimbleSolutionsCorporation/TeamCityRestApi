@@ -17,15 +17,15 @@ open RestSharp
 open TeamcityRestTypes
 
 type IHttpTeamcityConnector = 
-  abstract member HttpDeleteRequest : ITeamcityConfiguration * string -> IRestResponse
-  abstract member HttpRequest : ITeamcityConfiguration * string * Method -> IRestResponse
+  abstract member HttpDeleteRequest : ITeamcityConfiguration * string -> RestResponse
+  abstract member HttpRequest : ITeamcityConfiguration * string * Method -> RestResponse
   abstract member HttpGetRequest : ITeamcityConfiguration * string -> string
-  abstract member HttpPutRequest : ITeamcityConfiguration * string * Map<string, string> -> IRestResponse
+  abstract member HttpPutRequest : ITeamcityConfiguration * string * Map<string, string> -> RestResponse
   abstract member HttpPutRequest : ITeamcityConfiguration * string * string -> bool
-  abstract member HttpPostRequest : ITeamcityConfiguration * string * Map<string, string> -> IRestResponse
-  abstract member HttpPostRequestContent : ITeamcityConfiguration * string * string -> IRestResponse
-  abstract member HttpPutXmlContent : ITeamcityConfiguration * string * string -> IRestResponse  
-  abstract member HttpPutTxtContent : ITeamcityConfiguration * string * string -> IRestResponse  
-  abstract member HttpPostRequestDic : ITeamcityConfiguration * string * System.Collections.Generic.Dictionary<string, string> -> IRestResponse
+  abstract member HttpPostRequest : ITeamcityConfiguration * string * Map<string, string> -> RestResponse
+  abstract member HttpPostRequestContent : ITeamcityConfiguration * string * string -> RestResponse
+  abstract member HttpPutXmlContent : ITeamcityConfiguration * string * string -> RestResponse  
+  abstract member HttpPutTxtContent : ITeamcityConfiguration * string * string -> RestResponse  
+  abstract member HttpPostRequestDic : ITeamcityConfiguration * string * System.Collections.Generic.Dictionary<string, string> -> RestResponse
   abstract member HttpPutFileContent : ITeamcityConfiguration * url:string * payload:string * node:string -> string
 

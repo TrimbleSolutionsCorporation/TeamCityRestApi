@@ -24,6 +24,7 @@ type ITeamcityConnector =
   abstract member GetUserById : ConnectionConfiguration:ITeamcityConfiguration * id:string -> TcUser
   abstract member GetUserByUserName : ConnectionConfiguration:ITeamcityConfiguration * username:string -> TcUser
   abstract member GetUser : ConnectionConfiguration:ITeamcityConfiguration -> TcUser
+  abstract member UpdateUserLogin : ConnectionConfiguration:ITeamcityConfiguration * user:TcUser * newUserName:string  -> RestResponse
 
   abstract member DeleteBuildById : ConnectionConfiguration:ITeamcityConfiguration * id:string -> bool
   abstract member GetBuildById : ConnectionConfiguration:ITeamcityConfiguration * id:string -> TcBuild
@@ -98,6 +99,10 @@ type ITeamcityConnector =
   abstract member DisableAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string * reason:string -> bool
   abstract member EnableAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string -> bool
   abstract member EnableAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string * reason:string -> bool
+  abstract member AuthorizeAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string -> bool
+  abstract member AuthorizeAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string * reason:string -> bool
+  abstract member UnauthorizeAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string -> bool
+  abstract member UnauthorizeAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string * reason:string -> bool
 
   abstract member GetBuildConfigurationsFromProject : ConnectionConfiguration:ITeamcityConfiguration * projectToCheck:string -> System.Collections.Generic.List<TCBuildConfigurationType>
 
@@ -229,8 +234,8 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         newqueue
 
     let GetTests(build:TcBuild, conf:ITeamcityConfiguration, all:bool) =
-        let buildurltests = sprintf "/app/rest/testOccurrences?locator=build:id:%s,start:0,count:1000" build.Id
-        let tests = TestResponse.Parse(httpconnector.HttpRequest(conf, buildurltests, RestSharp.Method.GET).Content)
+        let buildurltests = sprintf "/app/rest/testOccurrences?locator=build:id:%s,start:0,count:100000" build.Id
+        let tests = TestResponse.Parse(httpconnector.HttpRequest(conf, buildurltests, RestSharp.Method.Get).Content)
         try
             if tests.Count > 0 then
                 for test in tests.TestOccurrence do
@@ -246,7 +251,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
                     if test.Status = "FAILURE" || all then
                         let buildfortestdetails = test.Href
-                        let testMetadataStr = httpconnector.HttpRequest(conf, buildfortestdetails + "?fields=metadata", RestSharp.Method.GET).Content
+                        let testMetadataStr = httpconnector.HttpRequest(conf, buildfortestdetails + "?fields=metadata", RestSharp.Method.Get).Content
                         let testMetadata = TestMetaData.Parse(testMetadataStr)
                         if testMetadata.Metadata.Count > 0 then
                             for meta in testMetadata.Metadata.TypedValues do
@@ -256,7 +261,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                                 newMeta.Value <- meta.Value.String.Value
                                 newTest.MetaInformation.Add(newMeta)
                         
-                        let testStr = httpconnector.HttpRequest(conf, buildfortestdetails, RestSharp.Method.GET).Content
+                        let testStr = httpconnector.HttpRequest(conf, buildfortestdetails, RestSharp.Method.Get).Content
                         let testDetails = TestDetailsJson.Parse(testStr)
                         newTest.FailureDetails <- testDetails.Details
                         if newTest.Muted then
@@ -272,7 +277,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
                                     newTest.MuteInformation.Add(muteInfo)
                                 else
-                                    let testMuteDetails = TestMuteDetailsJson.Parse(httpconnector.HttpRequest(conf, testDetails.Test.Href, RestSharp.Method.GET).Content)
+                                    let testMuteDetails = TestMuteDetailsJson.Parse(httpconnector.HttpRequest(conf, testDetails.Test.Href, RestSharp.Method.Get).Content)
                                     if testMuteDetails.Mutes.Count > 0 then
                                         let AddMute(mute:TestMuteDetailsJson.Mute) = 
                                             muteInfo.Href <- try mute.Href with | ex -> ""
@@ -301,12 +306,12 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
     let GetProblems(build:TcBuild,conf:ITeamcityConfiguration)=
         let buildurlProblems= sprintf "/app/rest/problemOccurrences?locator=build:id:%s,start:0,count:1000" build.Id
-        let problemOccurancesResponse = ProblemOccurancesResponse.Parse(httpconnector.HttpRequest(conf, buildurlProblems, RestSharp.Method.GET).Content)
+        let problemOccurancesResponse = ProblemOccurancesResponse.Parse(httpconnector.HttpRequest(conf, buildurlProblems, RestSharp.Method.Get).Content)
         try
            if problemOccurancesResponse.Count > 0 then
                for problemOccurrence in problemOccurancesResponse.ProblemOccurrence do
                    let newProblem = new TcProblem()
-                   let problemOccurancesDetails = ProblemOccurancesDetailsResponse.Parse(httpconnector.HttpRequest(conf, problemOccurrence.Href, RestSharp.Method.GET).Content)
+                   let problemOccurancesDetails = ProblemOccurancesDetailsResponse.Parse(httpconnector.HttpRequest(conf, problemOccurrence.Href, RestSharp.Method.Get).Content)
                    newProblem.Id <- try problemOccurancesDetails.Problem.Id.ToString()  with | ex -> ""
                    newProblem.Href <-  try problemOccurancesDetails.Problem.Href with | ex -> ""
                    newProblem.Type <-  try problemOccurancesDetails.Problem.Type with | ex -> ""
@@ -319,7 +324,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
     let GetResultingProps(build:TcBuild,conf:ITeamcityConfiguration)=
         try
         let buildurlResultingProps = build.Href + "/resulting-properties"
-        let resultingProps = ResultingProperties.Parse(httpconnector.HttpRequest(conf, buildurlResultingProps, RestSharp.Method.GET).Content)
+        let resultingProps = ResultingProperties.Parse(httpconnector.HttpRequest(conf, buildurlResultingProps, RestSharp.Method.Get).Content)
         for prop in resultingProps.Property do
             let propToBuild = BuildProperty()
             propToBuild.Name <- prop.Name
@@ -357,6 +362,10 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             </mute> """ username username reason scopeid test resType
 
         payload
+
+    let changeUserPayloadXml(id:string, username:string)  = 
+        sprintf """<user id="%s" username="%s"/>""" id username
+
 
     let getPayloadXml(branch:string, buildid:string, comment:string, agent:string, atTop:bool)  = 
         let queueAtTop =
@@ -454,7 +463,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
 
             let rec getProjectFromProjectAnswer(outProject : TcProject, project:ProjectResponseTags.Project) = 
-                let data = ProjectResponseTags.Parse(httpconnector.HttpRequest(conf, outProject.Href, RestSharp.Method.GET).Content)
+                let data = ProjectResponseTags.Parse(httpconnector.HttpRequest(conf, outProject.Href, RestSharp.Method.Get).Content)
                 
                 if data.BuildTypes.Count > 0 then
                     for buildType in data.BuildTypes.BuildType do
@@ -465,7 +474,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         newConfig.Id <- buildType.Id
                         newConfig.WebUrl <- buildType.WebUrl
                         newConfig.Href <- buildType.Href
-                        let datax = BuildTypeResponse.Parse(httpconnector.HttpRequest(conf, newConfig.Href, RestSharp.Method.GET).Content)
+                        let datax = BuildTypeResponse.Parse(httpconnector.HttpRequest(conf, newConfig.Href, RestSharp.Method.Get).Content)
                         newConfig.BuildIdRef <- datax.Builds.Href
                         outProject.BuildConfigurationTypes.Add(newConfig)
 
@@ -510,9 +519,14 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             rootProject
 
     interface ITeamcityConnector with
+        member this.UpdateUserLogin(conf:ITeamcityConfiguration, user:TcUser, newUserName:string) =
+            let palyload = changeUserPayloadXml(user.Id, newUserName)
+            let url = sprintf "/app/rest/users/id:%s" user.Id
+            httpconnector.HttpPutXmlContent(conf, url, palyload)
+
         member this.GetTest(conf:ITeamcityConfiguration, testId:string) =
             let url = sprintf "/app/rest/testOccurrences/%s" testId
-            let content = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            let content = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
             let data = TestDetails.Parse(content)
             let newTest = new TcTest()
             newTest.Id <- data.Id
@@ -528,6 +542,26 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
         member this.GetTestsForBuild(conf:ITeamcityConfiguration, build:TcBuild) =
             GetTests(build, conf, true)
+
+        member this.UnauthorizeAgent(conf:ITeamcityConfiguration, id:string) =
+            let url = sprintf "/app/rest/agents/id:%s/authorized" id
+            httpconnector.HttpPutRequest(conf, url, "false")
+
+        member this.UnauthorizeAgent(conf:ITeamcityConfiguration, id:string, reason:string) =
+            let url = sprintf "/app/rest/agents/id:%s/authorizedInfo" id
+            let payload = sprintf """<authorizedInfo status="false"><comment><text>%s</text></comment></authorizedInfo> """ reason
+            let requestDAta = httpconnector.HttpPutXmlContent(conf, url, payload)
+            requestDAta.IsSuccessful
+
+        member this.AuthorizeAgent(conf:ITeamcityConfiguration, id:string) =
+            let url = sprintf "/app/rest/agents/id:%s/authorized" id
+            httpconnector.HttpPutRequest(conf, url, "true")
+
+        member this.AuthorizeAgent(conf:ITeamcityConfiguration, id:string, reason:string) =
+            let url = sprintf "/app/rest/agents/id:%s/authorizedInfo" id
+            let payload = sprintf """<authorizedInfo status="true"><comment><text>%s</text></comment></authorizedInfo> """ reason
+            let requestDAta = httpconnector.HttpPutXmlContent(conf, url, payload)
+            requestDAta.IsSuccessful
 
         member this.EnableAgent(conf:ITeamcityConfiguration, id:string) =
             let url = sprintf "/app/rest/agents/id:%s/enabled" id
@@ -558,7 +592,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
         member this.GetAllAgents(conf:ITeamcityConfiguration, details:bool) =
             let url = "/app/rest/agents?locator=enabled:true,connected:true"
-            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
             let dataParsed = AgentsResponse.Parse(reply)
             let agents = new System.Collections.Generic.List<TcAgent>()
             for agent in dataParsed.Agent do
@@ -567,7 +601,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 agentNew.Id <- agent.Id
                 agentNew.Href <- agent.Href
                 if details then
-                    let replyDetails = httpconnector.HttpRequest(conf, agent.Href, RestSharp.Method.GET).Content
+                    let replyDetails = httpconnector.HttpRequest(conf, agent.Href, RestSharp.Method.Get).Content
                     let dataParsedDetails = AgentDetails.Parse(replyDetails)
                     for prop in dataParsedDetails.Properties.Property do
                         if prop.Value.String.IsSome then
@@ -600,7 +634,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                     
             let url = "/app/rest/agents?" + locator + "fields=agent(id,name,typeId,href,webUrl,pool,ip,connected,enabled,authorized,authorizedInfo,enabledInfo,connectedInfo)"
 
-            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
             let dataParsed = AgentsResponse.Parse(reply)
             let agents = new System.Collections.Generic.List<TcAgent>()
             for agent in dataParsed.Agent do
@@ -623,7 +657,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 pool.Name  <- agent.Pool.Value.Name
                 agentNew.AgentPool <- pool
                 if details then
-                    let replyDetails = httpconnector.HttpRequest(conf, agent.Href, RestSharp.Method.GET).Content
+                    let replyDetails = httpconnector.HttpRequest(conf, agent.Href, RestSharp.Method.Get).Content
                     let dataParsedDetails = AgentDetails.Parse(replyDetails)
                     let authorizedInfoData = dataParsedDetails.AuthorizedInfo.JsonValue.ToString()
                     let authorizedStatusInfo = new StatusInfo()
@@ -704,12 +738,12 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
         member this.TriggerCheckForChanges(conf:ITeamcityConfiguration, vcsRootId:string) = 
             let url = "/app/rest/debug/vcsCheckingForChangesQueue?locator=vcsRoot:"
-            httpconnector.HttpRequest(conf, url, RestSharp.Method.GET) |> ignore
+            httpconnector.HttpRequest(conf, url, RestSharp.Method.Get) |> ignore
 
         member this.GetQueuedAndRunningBuildsByBranchAndConfig(conf:ITeamcityConfiguration, branch:string, buildConfig:string) =
             let queuedbuilds = new System.Collections.Generic.List<QueueBuild>()
             let url = sprintf "/app/rest/builds?locator=state:(queued:true,running:true),branch:%s,buildType:%s&fields=build(id,agent,state,status,startEstimate,buildTypeId,href,webUrl,comment,queuedDate,startDate,buildType,percentageComplete,number)" branch buildConfig
-            let dataParsed = QueuedBuildResponse.Parse(httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content)
+            let dataParsed = QueuedBuildResponse.Parse(httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content)
             for data in dataParsed.Build do
                 queuedbuilds.Add(QueuedBuildFromBuildData(data, branch))
             queuedbuilds
@@ -717,7 +751,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         member this.GetQueuedAndRunningBuildsByBranch(conf:ITeamcityConfiguration, branch:string) =
             let queuedbuilds = new System.Collections.Generic.List<QueueBuild>()
             let url = "/app/rest/builds?locator=state:(queued:true,running:true),branch:" + branch + "&fields=build(id,agent,state,status,startEstimate,buildTypeId,href,webUrl,comment,queuedDate,startDate,buildType,percentageComplete,number)"
-            let dataParsed = QueuedBuildResponse.Parse(httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content)
+            let dataParsed = QueuedBuildResponse.Parse(httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content)
             for data in dataParsed.Build do                
                 queuedbuilds.Add(QueuedBuildFromBuildData(data, branch))
             queuedbuilds
@@ -725,7 +759,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         member this.GetRunningBuilds(conf:ITeamcityConfiguration) =
             let queuedbuilds = new System.Collections.Generic.List<QueueBuild>()
             let url = "/app/rest/builds?locator=state:(running:true)&fields=build(id,agent,state,status,startEstimate,buildTypeId,href,webUrl,comment,queuedDate,startDate,buildType,percentageComplete,number,running-info)"
-            let dataParsed = QueuedBuildResponse.Parse(httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content)
+            let dataParsed = QueuedBuildResponse.Parse(httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content)
             for data in dataParsed.Build do                
                 queuedbuilds.Add(QueuedBuildFromBuildData(data, ""))
             queuedbuilds
@@ -733,19 +767,19 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         member this.GetRunningBuildsByBranch(conf:ITeamcityConfiguration, branch:string) =
             let queuedbuilds = new System.Collections.Generic.List<QueueBuild>()
             let url = "/app/rest/builds?locator=state:(running:true),branch:" + branch + "&fields=build(id,agent,state,status,startEstimate,buildTypeId,href,webUrl,comment,queuedDate,startDate,buildType,percentageComplete,number,running-info)"
-            let dataParsed = QueuedBuildResponse.Parse(httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content)
+            let dataParsed = QueuedBuildResponse.Parse(httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content)
             for data in dataParsed.Build do                
                 queuedbuilds.Add(QueuedBuildFromBuildData(data, branch))
             queuedbuilds
 
         member this.GetQueuedBuild(conf:ITeamcityConfiguration, urlRef:string, branch:string) =
-            let dataContent = httpconnector.HttpRequest(conf, urlRef, RestSharp.Method.GET).Content            
+            let dataContent = httpconnector.HttpRequest(conf, urlRef, RestSharp.Method.Get).Content            
             SingleQueuedBuildFromBuildData(dataContent, branch)
 
         member this.GetQueuedBuilds(conf:ITeamcityConfiguration) =
             let queuedbuilds = new System.Collections.Generic.List<QueueBuild>()
             let url = "/app/rest/buildQueue?fields=build(id,agent,state,status,startEstimate,buildTypeId,href,webUrl,waitReason,comment,queuedDate,startDate,branchName,buildType,percentageComplete,number)"
-            let dataContent = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            let dataContent = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
             let dataParsed = QueuedBuildResponse.Parse(dataContent)
             for data in dataParsed.Build do
                 if data.BranchName.String.IsSome then
@@ -825,7 +859,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
         member this.GetPendingChangesForBuildType(conf:ITeamcityConfiguration, buildTypeId:string, branch:string, limitForChanges:int) =
             let buildurl = sprintf "/app/rest/changes?locator=buildType:(id:%s),branch:%s,pending:true" buildTypeId branch
-            let contentString = httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content
+            let contentString = httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content
             let fullBuildData = Changes.Parse(contentString)
             let changes = System.Collections.Generic.List<Change>()
             for change in fullBuildData.Change do
@@ -838,7 +872,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                     changedata.Version <- change.Version
                     changedata.WebUrl <- change.WebUrl
     
-                    let changeComment = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.GET).Content)
+                    let changeComment = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
                     changedata.Comment <- changeComment.Comment
                     changes.Add(changedata)
 
@@ -847,11 +881,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
         member this.GetLog(conf:ITeamcityConfiguration, id:int) =
             let url = sprintf "/downloadBuildLog.html?buildId=%i" id
-            httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
 
         member this.Authenticate(conf:ITeamcityConfiguration) =
             let url = "/app/rest/vcs-roots"
-            let answerData = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET)
+            let answerData = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get)
             if answerData.StatusCode <> Net.HttpStatusCode.OK then
                 answerData.Content
             else
@@ -871,8 +905,9 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
             use writer = File.OpenWrite(endFilePath)
             let request = new RestRequest(url)
-            let CopyAction = System.Action<Stream>(fun responseStream ->
+            let CopyAction = Func<Stream, Stream>(fun responseStream ->
                 responseStream.CopyTo(writer)
+                null
             )
 
             request.ResponseWriter <- CopyAction
@@ -905,7 +940,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             (this :> ITeamcityConnector).GetBuildById(conf, id, getChanges, getTests, getArtifacts, getResultProps ,false)
         member this.GetBuildById(conf:ITeamcityConfiguration, id:string, getChanges:bool, getTests:bool, getArtifacts:bool, getResultProps:bool, getProblems:bool) =
             let buildurl = "/app/rest/builds/id:" + id
-            let contentString = httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content
+            let contentString = httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content
             let fullBuildData = UniqueBuildResponse.Parse(contentString)
             let newBuild = new TcBuild()
             newBuild.BuildConfigurationId <- fullBuildData.BuildType.Id
@@ -954,7 +989,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             | _ -> ()
 
             if getArtifacts then
-                let restponseArtifacts = ArtifactsPathResponse.Parse(httpconnector.HttpRequest(conf, fullBuildData.Artifacts.Href, RestSharp.Method.GET).Content)
+                let restponseArtifacts = ArtifactsPathResponse.Parse(httpconnector.HttpRequest(conf, fullBuildData.Artifacts.Href, RestSharp.Method.Get).Content)
                 if restponseArtifacts.Count <> 0 then
                     for artifactElem in restponseArtifacts.File do
                         let artifcat = new Artifact()
@@ -965,7 +1000,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             if getChanges then
                 try
                     let buildurlchanges = sprintf "/app/rest/changes?locator=build:(id:%s)&fields=count,change:(id,version,username,date,href,webUrl,files)" id
-                    let changesData = Changes.Parse(httpconnector.HttpRequest(conf, buildurlchanges, RestSharp.Method.GET).Content)         
+                    let changesData = Changes.Parse(httpconnector.HttpRequest(conf, buildurlchanges, RestSharp.Method.Get).Content)         
                     if changesData.Count <> 0 then
                         for change in changesData.Change do
                             let changedata = Change()
@@ -978,7 +1013,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                             if change.Files.Count <> 0 then
                                 for file in change.Files.File do 
                                     changedata.ListofChangedFiles.Add(file.File)
-                            let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.GET).Content)
+                            let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
                             changedata.Comment <- change.Comment
                             newBuild.ChangesData.Add(changedata)
                             changeLog <- changeLog + change.Username + " : " + change.Comment + "\r\n"
@@ -1083,11 +1118,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         "lookupLimit:" + nmbBuild.ToString() + ","
 
                 let buildurl = "/app/rest/builds/" + "?locator=" + lookupLimitLocator + "running:any," + "buildType:" + buildConf + getBranchLocator()
-                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content)
+                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
 
                 if data.Count > 0 then
                     for build in data.Build do
-                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.GET).Content
+                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.Get).Content
                         let fullBuildData = UniqueBuildResponse.Parse(contentString)
                         let newBuild = new TcBuild()
                         newBuild.Href <- fullBuildData.Href
@@ -1142,7 +1177,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                                 System.Diagnostics.Debug.WriteLine(ex.StackTrace)
 
                         if includeArtifacts then
-                            let responseContent = httpconnector.HttpRequest(conf, fullBuildData.Artifacts.Href, RestSharp.Method.GET).Content
+                            let responseContent = httpconnector.HttpRequest(conf, fullBuildData.Artifacts.Href, RestSharp.Method.Get).Content
                             let restponseArtifacts = ArtifactsPathResponse.Parse(responseContent)
                             if restponseArtifacts.Count <> 0 then
                                 for artifactElem in restponseArtifacts.File do
@@ -1155,7 +1190,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                             try
                                 if fullBuildData.LastChanges.Count <> 0 then
                                     for change in fullBuildData.LastChanges.Change do
-                                        let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.GET).Content)
+                                        let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
                                         let changedata = Change()
                                         changedata.Date <- change.Date
                                         changedata.Href <- change.Href
@@ -1219,11 +1254,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         "lookupLimit:" + nmbBuild.ToString() + ","
 
                 let buildurl = buildConf.BuildIdRef + "?locator=" + lookupLimitLocator + "running:any" + getBranchLocator()
-                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content)
+                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
 
                 if data.Count > 0 then
                     for build in data.Build do
-                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.GET).Content
+                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.Get).Content
                         let fullBuildData = UniqueBuildResponse.Parse(contentString)
                         let newBuild = new TcBuild()
                         newBuild.Artifact <- buildConf.Artifact
@@ -1271,7 +1306,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         | _ -> ()
 
                         if getArtifacts then
-                            let restponseArtifacts = ArtifactsPathResponse.Parse(httpconnector.HttpRequest(conf, fullBuildData.Artifacts.Href, RestSharp.Method.GET).Content)
+                            let restponseArtifacts = ArtifactsPathResponse.Parse(httpconnector.HttpRequest(conf, fullBuildData.Artifacts.Href, RestSharp.Method.Get).Content)
                             if restponseArtifacts.Count <> 0 then
                                 for artifactElem in restponseArtifacts.File do
                                     let artifcat = new Artifact()
@@ -1283,7 +1318,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                             try
                                 if fullBuildData.LastChanges.Count <> 0 then
                                     for change in fullBuildData.LastChanges.Change do
-                                        let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.GET).Content)
+                                        let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
                                         let changedata = Change()
                                         changedata.Date <- change.Date
                                         changedata.Href <- change.Href
@@ -1316,7 +1351,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                     ""
 
             let buildurl = sprintf "/app/rest/builds/?locator=buildType:%s,%sstatus:FAILURE,count:1000" buildConfig branchToUse
-            let data = BuildSummaryResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content)
+            let data = BuildSummaryResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
             let builds = System.Collections.Generic.List<TcBuild>()
             if data.Count > 0 then
                 for build in data.Build do
@@ -1335,7 +1370,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
         member this.GetBuildConfigurationsFromProject(conf:ITeamcityConfiguration, projectName:string) =
             let buildurlFirst = sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)" projectName
-            let dataAnswer = httpconnector.HttpRequest(conf, buildurlFirst, RestSharp.Method.GET).Content
+            let dataAnswer = httpconnector.HttpRequest(conf, buildurlFirst, RestSharp.Method.Get).Content
             let dataFirst = BuildTypeResponseProjectRecursive.Parse(dataAnswer)
             let builds = System.Collections.Generic.List<TCBuildConfigurationType>()
             if dataAnswer.Contains("\"buildType\":") then
@@ -1358,7 +1393,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                     ""
 
             let buildurlFirst = sprintf "/app/rest/buildTypes?locator=build:(buildType:%s)&fields=buildType(id,name,builds($locator(%scount:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment)))" buildTypeId branchToUse
-            let dataS = httpconnector.HttpRequest(conf, buildurlFirst, RestSharp.Method.GET)
+            let dataS = httpconnector.HttpRequest(conf, buildurlFirst, RestSharp.Method.Get)
             let dataAnswer = dataS.Content
             let builds = System.Collections.Generic.List<TcBuild>()
             if dataAnswer <> "" then
@@ -1393,7 +1428,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 else
                     sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)&fields=buildType(id,comment,name,builds($locator(branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),count:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment,branchName)))" projectName branch
 
-            let dataS = httpconnector.HttpRequest(conf, urlToUse, RestSharp.Method.GET)
+            let dataS = httpconnector.HttpRequest(conf, urlToUse, RestSharp.Method.Get)
             let dataAnswer = dataS.Content
             let builds = System.Collections.Generic.List<TcBuild>()
             if dataAnswer <> "" then
@@ -1428,12 +1463,12 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 else
                     ""                    
             let buildurlFirst = sprintf "/app/rest/builds/?locator=affectedProject:(id:%s),%sstatus:FAILURE,count:1000" projectName branchToUse
-            let dataFirst = BuildSummaryResponse.Parse(httpconnector.HttpRequest(conf, buildurlFirst, RestSharp.Method.GET).Content)
+            let dataFirst = BuildSummaryResponse.Parse(httpconnector.HttpRequest(conf, buildurlFirst, RestSharp.Method.Get).Content)
             let builds = System.Collections.Generic.List<TcBuild>()
             if dataFirst.Count > 0 then
                 for build in dataFirst.Build do
                     let buildurl = sprintf "/app/rest/builds/?locator=buildType:%s,%scount:1000" build.BuildTypeId branchToUse
-                    let data = BuildSummaryResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content)
+                    let data = BuildSummaryResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
                     if data.Count > 0 && data.Build.[0].Status = "FAILURE" then
                         let newBuild = new TcBuild()
                         newBuild.Href <- build.Href
@@ -1505,11 +1540,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         ",branch:" + branch
 
                 let buildurl = "/app/rest/builds/" + "?locator=" + lookupLimitLocatorToUse + "buildType:" + buildConf + getBranchLocator() + deepLimitLocator
-                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content)
+                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
 
                 if data.Count > 0 then
                     for build in data.Build do
-                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.GET).Content
+                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.Get).Content
                         let fullBuildData = UniqueBuildResponse.Parse(contentString)
                         let newBuild = new TcBuild()
                         newBuild.Href <- fullBuildData.Href
@@ -1556,11 +1591,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                            GetTests(newBuild, conf, false)
                         if getdetailedChangeLog then
                             let mutable changeLog = ""
-                            let replyChangeData = Changes.Parse(httpconnector.HttpRequest(conf, fullBuildData.Changes.Href, RestSharp.Method.GET).Content)
+                            let replyChangeData = Changes.Parse(httpconnector.HttpRequest(conf, fullBuildData.Changes.Href, RestSharp.Method.Get).Content)
                             try
                                 if replyChangeData.Count > 0 then
                                     for change in replyChangeData.Change do
-                                        let replyChangeDataUnique = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.GET).Content)
+                                        let replyChangeDataUnique = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
                                         let changedata = Change()
                                         changedata.Date <- replyChangeDataUnique.Date
                                         changedata.Href <- replyChangeDataUnique.Href
@@ -1604,7 +1639,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         ",branch:" + branch
 
                 let buildurl = "/app/rest/builds/" + "?locator=" + lookupLimitLocatorToUse + "buildType:" + buildConf + getBranchLocator() + deepLimitLocator + "&fields=build(id,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,artifacts,changes,branchName,comment,agent,buildType,properties)"
-                let contentString = httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content
+                let contentString = httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content
                 let dataToUse = BuildResponse.Parse(contentString)
 
                 for fullBuildData in dataToUse.Build do
@@ -1633,11 +1668,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
                     if getdetailedChangeLog then
                         let mutable changeLog = ""
-                        let replyChangeData = Changes.Parse(httpconnector.HttpRequest(conf, fullBuildData.Changes.Value.Href, RestSharp.Method.GET).Content)
+                        let replyChangeData = Changes.Parse(httpconnector.HttpRequest(conf, fullBuildData.Changes.Value.Href, RestSharp.Method.Get).Content)
                         try
                             if replyChangeData.Count > 0 then
                                 for change in replyChangeData.Change do
-                                    let replyChangeDataUnique = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.GET).Content)
+                                    let replyChangeDataUnique = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
                                     let changedata = Change()
                                     changedata.Date <- replyChangeDataUnique.Date
                                     changedata.Href <- replyChangeDataUnique.Href
@@ -1664,11 +1699,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             let builds = System.Collections.Generic.List<TcBuild>()
             try
                let buildurl = "/app/rest/builds/" + "?locator=buildType:" + buildConf + ",canceled:all,status:UNKNOWN"
-               let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.GET).Content)
+               let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
 
                if data.Count > 0 then
                     for build in data.Build do
-                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.GET).Content
+                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.Get).Content
                         let fullBuildData = UniqueBuildResponse.Parse(contentString)
                         let newBuild = new TcBuild()
                         newBuild.Href <- fullBuildData.Href
@@ -1711,11 +1746,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
             let uiWebRequest =
                 if branch = "master" || branch = "" then
-                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,default:true),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,project,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType)" buildConf count lookupLimitLocator
+                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,default:true),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,project,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType,comment)" buildConf count lookupLimitLocator
                 else
-                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,project,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType)" branch buildConf count lookupLimitLocator
+                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,project,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType,comment)" branch buildConf count lookupLimitLocator
 
-            let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, uiWebRequest, RestSharp.Method.GET).Content)
+            let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, uiWebRequest, RestSharp.Method.Get).Content)
 
             for build in data.Build do
                 try
@@ -1739,6 +1774,9 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
                     if build.FinishDate.IsSome then
                         newBuild.EndTime <- ParseDate(build.FinishDate.Value)
+
+                    if build.Comment.IsSome then
+                        newBuild.Comment <- try build.Comment.Value.Text with | _ -> ""
 
                     builds.Add(newBuild)
                 with
@@ -1774,7 +1812,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
             let fields = "&fields=vcs-root(id,modificationCheckInterval,href,name,properties($long,$locator:name:(value:(url%7Cpush_url%7CteamcitySshKey),matchType:matches)))"
             let url = sprintf "/app/rest/vcs-roots?locator=%s,count:%i%s" projectLocator count fields
-            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
             let vcsRoots = new System.Collections.Generic.List<VcRoot>()
             let dataParsed = VcsRootsSingleResponse.Parse(reply)
             for vcs in dataParsed.VcsRoot do
@@ -1796,7 +1834,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 else
                     ""
             let url = sprintf "/app/rest/vcs-roots?locator=count:%i%s" count projectLocator
-            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
             let vcsRoots = new System.Collections.Generic.List<VcRoot>()
             let dataParsed = VcsRootsResponse.Parse(reply)
             for vcs in dataParsed.VcsRoot do
@@ -1805,7 +1843,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 vcsRoot.Name <- vcs.Name
                 vcsRoot.Id <- vcs.Id
                 if details then
-                    let detailsurlReply = httpconnector.HttpRequest(conf, vcs.Href, RestSharp.Method.GET).Content
+                    let detailsurlReply = httpconnector.HttpRequest(conf, vcs.Href, RestSharp.Method.Get).Content
                     let dataParsedDetails = VcsRootDetailsReponse.Parse(detailsurlReply)
                     for property in dataParsedDetails.Properties.Property do
                         if property.Value.String.IsSome then
@@ -1822,12 +1860,12 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 else
                     "/app/rest/projects/id:" + configuration
 
-            GetProjectsFromReply(httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content, conf)
+            GetProjectsFromReply(httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content, conf)
 
         member this.GetAllUsers(conf:ITeamcityConfiguration) =
             try
             let url = "/app/rest/users"
-            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
             let users = new System.Collections.Generic.List<TcUser>()
             let dataParsed = AllUsersResponse.Parse(reply)
             if dataParsed.Count > 0 then
@@ -1837,7 +1875,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                     newUser.Name <- user.Name
                     newUser.Href <- user.Href
                     newUser.UserName <- user.Username
-                    let replyDetails = httpconnector.HttpRequest(conf, user.Href, RestSharp.Method.GET).Content
+                    let replyDetails = httpconnector.HttpRequest(conf, user.Href, RestSharp.Method.Get).Content
                     let dataParsedDetails = UserRespose.Parse(replyDetails)
                     newUser.Email <- dataParsedDetails.Email
                     users.Add(newUser)
@@ -1848,7 +1886,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
              try
              let encodedName= System.Web.HttpUtility.HtmlEncode(name)
              let url = "/app/rest/users/name:" + encodedName
-             let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+             let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
              let dataParsed = UserRespose.Parse(reply)
              let newUser = new TcUser()
              newUser.Id <- try dataParsed.Id.ToString() with | _ -> ""
@@ -1863,7 +1901,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
              try
              let encodedemail= System.Web.HttpUtility.HtmlEncode(email)
              let url = "/app/rest/users/email:" + encodedemail
-             let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+             let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
              let dataParsed = UserRespose.Parse(reply)
              let newUser = new TcUser()
              newUser.Id <- try dataParsed.Id.ToString() with | _ -> ""
@@ -1877,7 +1915,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         member this.GetUserById(conf:ITeamcityConfiguration,id:string) =
             try
             let url = "/app/rest/users/id:"+id
-            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
             let dataParsed = UserRespose.Parse(reply)
             let newUser = new TcUser()
             newUser.Id <- try dataParsed.Id.ToString() with | _ -> ""
@@ -1891,7 +1929,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         member this.GetUser(conf:ITeamcityConfiguration) = 
             try
                 let url = "/app/rest/ui/users/current?fields=id,name,email,username,href"
-                let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+                let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
                 let dataParsed = UserRespose.Parse(reply)
 
                 let newUser = new TcUser()
@@ -1906,7 +1944,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         member this.GetUserByUserName(conf:ITeamcityConfiguration,username:string) =
             try
                 let url = "/app/rest/users/username:"+username
-                let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.GET).Content
+                let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
                 let dataParsed = UserRespose.Parse(reply)
                 let newUser = new TcUser()
                 newUser.Id <- try dataParsed.Id.ToString() with | _ -> ""

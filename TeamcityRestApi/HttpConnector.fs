@@ -32,20 +32,21 @@ type JsonTeamcityConnector() =
 
     let GetSessionCookie(userconf : ITeamcityConfiguration) =
         if sessionCookie = null && userconf.Token = "" then
-            let client = new RestClient(userconf.Hostname)
-            client.Timeout <- 250000
+
+            let options = new RestClientOptions(userconf.Hostname)
+            options.MaxTimeout <- 250000
+            let client = new RestClient(options)
+
             if userconf.Token <> "" then
                 client.Authenticator <- new JwtAuthenticator(userconf.Token)
             else
                 client.Authenticator <- new HttpBasicAuthenticator(userconf.Username, userconf.Password)
 
-            let request = new RestRequest("/app/rest/users", Method.GET)
+            let request = new RestRequest("/app/rest/users", Method.Get)
             request.RequestFormat <- DataFormat.Json
             let reply = client.Execute(request)
-            let sessionsCookie =
-                reply.Cookies
-                |> List.ofSeq
-                |> Seq.tryFind (fun cookie -> cookie.Name = "TCSESSIONID")
+            let sessionsCookie = 
+                try Some reply.Cookies.["TCSESSIONID"] with | _ -> None
         
             match sessionsCookie with
             | Some cookie -> sessionCookie <- cookie
@@ -56,16 +57,19 @@ type JsonTeamcityConnector() =
                       methodin : Method,
                       data : Map<string, string>) =
         GetSessionCookie(userConf)
-        let client = new RestClient(userConf.Hostname)
+        let options = new RestClientOptions(userConf.Hostname)
+        options.MaxTimeout <- 250000
+        let client = new RestClient(options)
         let request = new RestRequest(url, methodin)
-        client.Timeout <- 250000
+        
         if sessionCookie = null then
             if userConf.Token <> "" then
                 client.Authenticator <- new JwtAuthenticator(userConf.Token)
             else
                 client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
         else
-            request.AddCookie(sessionCookie.Name, sessionCookie.Value) |> ignore
+            client.CookieContainer.Add(new Cookie(sessionCookie.Name, sessionCookie.Value, sessionCookie.Path, sessionCookie.Domain))
+
         request.AddHeader("Origin", userConf.Hostname) |> ignore
         data |> Seq.iter (fun elem -> request.AddParameter(elem.Key, elem.Value) |> ignore)
         request.RequestFormat <- DataFormat.Json
@@ -83,21 +87,23 @@ type JsonTeamcityConnector() =
 
         member this.HttpGetRequest(userConf : ITeamcityConfiguration, url : string) =
             GetSessionCookie(userConf) 
-            let client = new RestClient(userConf.Hostname)
-            client.Timeout <- 250000
-            let request = new RestRequest(url, Method.GET)
+            let options = new RestClientOptions(userConf.Hostname)
+            options.MaxTimeout <- 250000
+            let client = new RestClient(options)
+            
+            let request = new RestRequest(url, Method.Get)
             if sessionCookie = null then
                 if userConf.Token <> "" then
                     client.Authenticator <- new JwtAuthenticator(userConf.Token)
                 else
                     client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
             else
-                request.AddCookie(sessionCookie.Name, sessionCookie.Value) |> ignore
+                client.CookieContainer.Add(new Cookie(sessionCookie.Name, sessionCookie.Value, sessionCookie.Path, sessionCookie.Domain))
             request.AddHeader("Accept", "application/xml") |> ignore
             client.Execute(request).Content
 
         member this.HttpDeleteRequest(userConf : ITeamcityConfiguration, url : string) =
-            (this :> IHttpTeamcityConnector).HttpRequest(userConf, url, Method.DELETE)
+            (this :> IHttpTeamcityConnector).HttpRequest(userConf, url, Method.Delete)
 
         member this.HttpPutFileContent(userConf : ITeamcityConfiguration,
                                        url : string,
@@ -126,10 +132,10 @@ type JsonTeamcityConnector() =
             data
 
         member this.HttpPutRequest(userConf : ITeamcityConfiguration, url : string, data : Map<string, string>) =
-            let reply = DoRestRequest(userConf, url, Method.PUT, data)
+            let reply = DoRestRequest(userConf, url, Method.Put, data)
             if reply.StatusCode <> HttpStatusCode.OK then
                 sessionCookie <- null
-                DoRestRequest(userConf, url, Method.PUT, data)
+                DoRestRequest(userConf, url, Method.Put, data)
             else
                 reply
 
@@ -149,41 +155,42 @@ type JsonTeamcityConnector() =
 
             let bytes = Encoding.UTF8.GetBytes(data)
             try
-                client.UploadData(userconf.Hostname + url,"PUT", bytes) |> ignore
+                let response = client.UploadData(userconf.Hostname + url,"PUT", bytes)
                 true
             with
             | ex -> false
 
         member this.HttpPostRequest(userConf : ITeamcityConfiguration, url : string, data : Map<string, string>) =
-            let reply = DoRestRequest(userConf, url, Method.PUT, data)
+            let reply = DoRestRequest(userConf, url, Method.Put, data)
             if reply.StatusCode <> HttpStatusCode.OK then
                 sessionCookie <- null
-                DoRestRequest(userConf, url, Method.POST, data)
+                DoRestRequest(userConf, url, Method.Post, data)
             else
                 reply
 
         member this.HttpPutXmlContent(userConf : ITeamcityConfiguration, url : string, xmlData : string) =
-            let client = new RestClient(userConf.Hostname)
-            client.Timeout <- 250000
+            let options = new RestClientOptions(userConf.Hostname)
+            options.MaxTimeout <- 250000
+            let client = new RestClient(options)
             if userConf.Token <> "" then
                 client.Authenticator <- new JwtAuthenticator(userConf.Token)
             else
                 client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
-            let request = new RestRequest(url, Method.PUT)
+            let request = new RestRequest(url, Method.Put)
             request.AddHeader("Accept", "application/xml") |> ignore
-            request.Parameters.Clear()
             request.AddParameter("application/xml", xmlData, ParameterType.RequestBody) |> ignore
             let result = client.Execute(request)
             result
 
         member this.HttpPutTxtContent(userConf : ITeamcityConfiguration, url : string, txtData : string) =
-            let client = new RestClient(userConf.Hostname)
-            client.Timeout <- 250000
+            let options = new RestClientOptions(userConf.Hostname)
+            options.MaxTimeout <- 250000
+            let client = new RestClient(options)
             if userConf.Token <> "" then
                 client.Authenticator <- new JwtAuthenticator(userConf.Token)
             else
                 client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
-            let request = new RestRequest(url, Method.PUT)
+            let request = new RestRequest(url, Method.Put)
             request.AddHeader("Origin", userConf.Hostname) |> ignore
             request.AddHeader("Content-Type", "text/plain") |> ignore
             request.AddHeader("Accept", "*/*") |> ignore
@@ -192,15 +199,15 @@ type JsonTeamcityConnector() =
             result
 
         member this.HttpPostRequestContent(userConf : ITeamcityConfiguration, url : string, data : string) =
-            let client = new RestClient(userConf.Hostname)
-            client.Timeout <- 250000
+            let options = new RestClientOptions(userConf.Hostname)
+            options.MaxTimeout <- 250000
+            let client = new RestClient(options)
             if userConf.Token <> "" then
                 client.Authenticator <- new JwtAuthenticator(userConf.Token)
             else
                 client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
-            let request = new RestRequest(url, Method.POST)
+            let request = new RestRequest(url, Method.Post)
             request.AddHeader("Accept", "application/xml") |> ignore
-            request.Parameters.Clear()
             request.AddParameter("application/xml", data, ParameterType.RequestBody) |> ignore
             let result = client.Execute(request)
             result
@@ -208,10 +215,10 @@ type JsonTeamcityConnector() =
         member this.HttpPostRequestDic(userConf : ITeamcityConfiguration,
                                        url : string,
                                        data : System.Collections.Generic.Dictionary<string, string>) =
-            let reply = DoRestRequest(userConf, url, Method.POST, toMap data)
+            let reply = DoRestRequest(userConf, url, Method.Post, toMap data)
             if reply.StatusCode <> HttpStatusCode.OK then
                 sessionCookie <- null
-                DoRestRequest(userConf, url, Method.POST, toMap data)
+                DoRestRequest(userConf, url, Method.Post, toMap data)
             else
                 reply
 

@@ -5,14 +5,10 @@
     <OutputPath>..\BuildDrop\</OutputPath>
     <AssemblyVersion>4.0.0.0</AssemblyVersion>
     <FileVersion>4.0.0.0</FileVersion>
-    <Version>4.11.3</Version>
+    <Version>4.13.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\AssemblyKey.snk</AssemblyOriginatorKeyFile>
     <PackageOutputPath>..\BuildDrop\</PackageOutputPath>
   </PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="RestSharp" Version="106.10.1" />
-	</ItemGroup>
 </Project>
