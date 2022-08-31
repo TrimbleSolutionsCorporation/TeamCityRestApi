@@ -88,7 +88,7 @@ namespace TeamcityRestConnect.Test
             }
         }
 
-        [Test]
+        //[Test]
         public void MigrateUsers()
         {
             var configuration = new Configuration();
@@ -107,6 +107,20 @@ namespace TeamcityRestConnect.Test
                     Console.WriteLine(result);
                 }
             }
+        }
+
+
+        //[Test]
+        public void DonwloadTest()
+        {
+            var configuration = new Configuration();
+            configuration.Hostname = "https://teamcity.tekla.com";
+            configuration.Username = "";
+            configuration.Password = "";
+            configuration.Token = "";
+            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector());
+            var build = restClient.GetBuildById(configuration, "33607074");
+            restClient.DownloadArtifact(configuration, build, "PatchedReferenceFiles_FTC_11109.LoadGroups_17.ReferenceValidation.zip", "PatchedReferenceFiles_FTC_11109.LoadGroups_17.ReferenceValidation.zip", false);
         }
     }
 }

@@ -892,26 +892,18 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 ""
 
         member this.DownloadArtifact(conf:ITeamcityConfiguration, build:TcBuild, artifactPath:string, outFile:string, useDsk:bool) =
-            let url = build.Href + "/artifacts/content/" + artifactPath
+            let url = conf.Hostname.TrimEnd('/') + build.Href + "/artifacts/content/" + artifactPath
             let mutable endFilePath = outFile
-            if useDsk then
+            if useDsk then 
                 endFilePath <- Path.GetTempFileName()
 
-            let client = new RestClient(conf.Hostname)
-            if conf.Token <> "" then
-                client.Authenticator <- new JwtAuthenticator(conf.Token)
-            else
-                client.Authenticator <- new HttpBasicAuthenticator(conf.Username, conf.Password)
+            let myWebClient = new WebClient()
+            if conf.Token = "" then
+                myWebClient.Credentials <- new NetworkCredential(conf.Username, conf.Password)
+            else                
+                myWebClient.Headers.[HttpRequestHeader.Authorization] <- "Bearer " + conf.Token
 
-            use writer = File.OpenWrite(endFilePath)
-            let request = new RestRequest(url)
-            let CopyAction = Func<Stream, Stream>(fun responseStream ->
-                responseStream.CopyTo(writer)
-                null
-            )
-
-            request.ResponseWriter <- CopyAction
-            client.DownloadData(request) |> ignore
+            myWebClient.DownloadFile(url, endFilePath)
 
             if useDsk then
                 try
