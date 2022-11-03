@@ -26,6 +26,11 @@ type ITeamcityConnector =
   abstract member GetUser : ConnectionConfiguration:ITeamcityConfiguration -> TcUser
   abstract member UpdateUserLogin : ConnectionConfiguration:ITeamcityConfiguration * user:TcUser * newUserName:string  -> RestResponse
 
+  abstract member GetTestDetails: test:TcTest * conf:ITeamcityConfiguration -> unit           
+  abstract member GetTestDetailsForBuild: tcBuild:TcBuild * conf:ITeamcityConfiguration * all:bool -> unit
+  abstract member GetProblemsForBuild: tcBuild:TcBuild * conf:ITeamcityConfiguration -> unit
+  abstract member GetResultingProps: tcBuild:TcBuild * conf:ITeamcityConfiguration -> unit
+
   abstract member DeleteBuildById : ConnectionConfiguration:ITeamcityConfiguration * id:string -> bool
   abstract member GetBuildById : ConnectionConfiguration:ITeamcityConfiguration * id:string -> TcBuild
   abstract member GetBuildById : ConnectionConfiguration:ITeamcityConfiguration * id:string * getAllChanges:bool -> TcBuild
@@ -233,6 +238,58 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             ()
         newqueue
 
+    let GetTest(test:TcTest, conf:ITeamcityConfiguration) =
+        let buildfortestdetails = test.Href
+        let testMetadataStr = httpconnector.HttpRequest(conf, buildfortestdetails + "?fields=metadata", RestSharp.Method.Get).Content
+        let testMetadata = TestMetaData.Parse(testMetadataStr)
+        if testMetadata.Metadata.Count > 0 then
+            for meta in testMetadata.Metadata.TypedValues do
+                let newMeta = TcMetaData()
+                newMeta.Name <- meta.Name
+                newMeta.Type <- meta.Type
+                newMeta.Value <- meta.Value.String.Value
+                test.MetaInformation.Add(newMeta)
+                        
+        let testStr = httpconnector.HttpRequest(conf, buildfortestdetails, RestSharp.Method.Get).Content
+        let testDetails = TestDetailsJson.Parse(testStr)
+        test.FailureDetails <- testDetails.Details
+        if test.Muted then
+            let muteInfo = MuteDetails()
+            try
+                if testStr.Contains("\"mute\":") then
+                    muteInfo.Href <- try testDetails.Mute.Href with | ex -> ""
+                    muteInfo.Name <- try testDetails.Mute.Assignment.User.Name with | ex -> ""
+                    muteInfo.UserName <- try testDetails.Mute.Assignment.User.Username with | ex -> ""
+                    muteInfo.Text <- try testDetails.Mute.Assignment.Text with | ex -> ""
+                    // "timestamp": "20191217T033420+0200",
+                    muteInfo.TimeStamp <- try DateTime.ParseExact(testDetails.Mute.Assignment.Timestamp.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture) with | _ -> DateTime.Now
+                    test.MuteInformation.Add(muteInfo)
+                else
+                    let testMuteDetails = TestMuteDetailsJson.Parse(httpconnector.HttpRequest(conf, testDetails.Test.Href, RestSharp.Method.Get).Content)
+                    if testMuteDetails.Mutes.Count > 0 then
+                        let AddMute(mute:TestMuteDetailsJson.Mute) = 
+                            muteInfo.Href <- try mute.Href with | ex -> ""
+                            muteInfo.Name <- try mute.Assignment.User.Name with | ex -> ""
+                            muteInfo.UserName <- try mute.Assignment.User.Username with | ex -> ""
+                            muteInfo.Text <- try mute.Assignment.Text with | ex -> ""
+                            test.MuteInformation.Add(muteInfo)
+
+                        testMuteDetails.Mutes.Mute
+                            |> Seq.iter (fun mute -> AddMute(mute))
+            with
+            | ex -> ()
+
+        try
+            if testDetails.JsonValue.ToString().Contains("firstFailed") then
+                let firstFailure = TcTest()
+                firstFailure.Href <- testDetails.FirstFailed.Href
+                firstFailure.Id <- testDetails.FirstFailed.Id
+                firstFailure.Status <- testDetails.FirstFailed.Status
+                firstFailure.Name <- testDetails.FirstFailed.Name
+                test.FirstFailure <- firstFailure
+        with
+        | ex -> ()
+
     let GetTests(build:TcBuild, conf:ITeamcityConfiguration, all:bool) =
         let buildurltests = sprintf "/app/rest/testOccurrences?locator=build:id:%s,start:0,count:100000" build.Id
         let tests = TestResponse.Parse(httpconnector.HttpRequest(conf, buildurltests, RestSharp.Method.Get).Content)
@@ -250,57 +307,8 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                     newTest.Href <- test.Href
 
                     if test.Status = "FAILURE" || all then
-                        let buildfortestdetails = test.Href
-                        let testMetadataStr = httpconnector.HttpRequest(conf, buildfortestdetails + "?fields=metadata", RestSharp.Method.Get).Content
-                        let testMetadata = TestMetaData.Parse(testMetadataStr)
-                        if testMetadata.Metadata.Count > 0 then
-                            for meta in testMetadata.Metadata.TypedValues do
-                                let newMeta = TcMetaData()
-                                newMeta.Name <- meta.Name
-                                newMeta.Type <- meta.Type
-                                newMeta.Value <- meta.Value.String.Value
-                                newTest.MetaInformation.Add(newMeta)
-                        
-                        let testStr = httpconnector.HttpRequest(conf, buildfortestdetails, RestSharp.Method.Get).Content
-                        let testDetails = TestDetailsJson.Parse(testStr)
-                        newTest.FailureDetails <- testDetails.Details
-                        if newTest.Muted then
-                            let muteInfo = MuteDetails()
-                            try
-                                if testStr.Contains("\"mute\":") then
-                                    muteInfo.Href <- try testDetails.Mute.Href with | ex -> ""
-                                    muteInfo.Name <- try testDetails.Mute.Assignment.User.Name with | ex -> ""
-                                    muteInfo.UserName <- try testDetails.Mute.Assignment.User.Username with | ex -> ""
-                                    muteInfo.Text <- try testDetails.Mute.Assignment.Text with | ex -> ""
-                                    // "timestamp": "20191217T033420+0200",
-                                    muteInfo.TimeStamp <- try DateTime.ParseExact(testDetails.Mute.Assignment.Timestamp.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture) with | _ -> DateTime.Now
+                        GetTest(newTest, conf)
 
-                                    newTest.MuteInformation.Add(muteInfo)
-                                else
-                                    let testMuteDetails = TestMuteDetailsJson.Parse(httpconnector.HttpRequest(conf, testDetails.Test.Href, RestSharp.Method.Get).Content)
-                                    if testMuteDetails.Mutes.Count > 0 then
-                                        let AddMute(mute:TestMuteDetailsJson.Mute) = 
-                                            muteInfo.Href <- try mute.Href with | ex -> ""
-                                            muteInfo.Name <- try mute.Assignment.User.Name with | ex -> ""
-                                            muteInfo.UserName <- try mute.Assignment.User.Username with | ex -> ""
-                                            muteInfo.Text <- try mute.Assignment.Text with | ex -> ""
-                                            newTest.MuteInformation.Add(muteInfo)
-
-                                        testMuteDetails.Mutes.Mute
-                                            |> Seq.iter (fun mute -> AddMute(mute))
-                            with
-                            | ex -> ()
-
-                        try
-                            if testDetails.JsonValue.ToString().Contains("firstFailed") then
-                                let firstFailure = TcTest()
-                                firstFailure.Href <- testDetails.FirstFailed.Href
-                                firstFailure.Id <- testDetails.FirstFailed.Id
-                                firstFailure.Status <- testDetails.FirstFailed.Status
-                                firstFailure.Name <- testDetails.FirstFailed.Name
-                                newTest.FirstFailure <- firstFailure
-                        with
-                        | ex -> ()
                     build.Tests.Add(newTest)
         with | ex -> ()
 
@@ -519,6 +527,18 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             rootProject
 
     interface ITeamcityConnector with
+        member this.GetTestDetails(test:TcTest, conf:ITeamcityConfiguration) = 
+            GetTest(test, conf)
+
+        member this.GetTestDetailsForBuild(tcBuild:TcBuild, conf:ITeamcityConfiguration, all:bool) = 
+            GetTests(tcBuild, conf, all)
+
+        member this.GetProblemsForBuild(tcBuild:TcBuild, conf:ITeamcityConfiguration) = 
+            GetProblems(tcBuild, conf)
+
+        member this.GetResultingProps(tcBuild:TcBuild, conf:ITeamcityConfiguration) = 
+            GetResultingProps(tcBuild, conf)            
+
         member this.UpdateUserLogin(conf:ITeamcityConfiguration, user:TcUser, newUserName:string) =
             let palyload = changeUserPayloadXml(user.Id, newUserName)
             let url = sprintf "/app/rest/users/id:%s" user.Id
@@ -1415,10 +1435,10 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         member this.GetLastBuildsFromProject(conf:ITeamcityConfiguration, projectName:string, branch:string) =
 
             let urlToUse =
-                if branch = "master" || branch = "" then
-                    sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)&fields=buildType(id,comment,name,builds($locator(branch:(policy:ALL_BRANCHES,default:true),count:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment,branchName)))" projectName
+                if branch = "" then
+                    sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)&fields=buildType(id,comment,name,builds($locator(branch:(default:true),count:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment,branchName)))" projectName
                 else
-                    sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)&fields=buildType(id,comment,name,builds($locator(branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),count:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment,branchName)))" projectName branch
+                    sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)&fields=buildType(id,comment,name,builds($locator(branch:%s,count:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment,branchName)))" projectName branch
 
             let dataS = httpconnector.HttpRequest(conf, urlToUse, RestSharp.Method.Get)
             let dataAnswer = dataS.Content

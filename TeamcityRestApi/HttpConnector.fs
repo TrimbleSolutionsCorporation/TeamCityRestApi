@@ -207,7 +207,7 @@ type JsonTeamcityConnector() =
             else
                 client.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
             let request = new RestRequest(url, Method.Post)
-            request.AddHeader("Accept", "application/xml") |> ignore
+            request.AddHeader("Accept", "application/json") |> ignore
             request.AddParameter("application/xml", data, ParameterType.RequestBody) |> ignore
             let result = client.Execute(request)
             result
