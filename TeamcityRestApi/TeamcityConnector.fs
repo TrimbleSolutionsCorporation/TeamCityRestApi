@@ -93,6 +93,7 @@ type ITeamcityConnector =
   abstract member DeleteConfiguration : ConnectionConfiguration:ITeamcityConfiguration * id:string -> bool
   abstract member DeleteProject : ConnectionConfiguration:ITeamcityConfiguration * id:string -> bool
   abstract member CancelBuild : ConnectionConfiguration:ITeamcityConfiguration * buildUrl:string * readInToQueue:bool -> bool
+  abstract member CancelBuild : ConnectionConfiguration:ITeamcityConfiguration * buildUrl:string * readInToQueue:bool * cancelingComment:string * cancelingApplication:string -> bool
   abstract member MoveBuildToTop : ConnectionConfiguration:ITeamcityConfiguration * buildid:string -> bool
   
   abstract member MuteTest : ConnectionConfiguration:ITeamcityConfiguration * scopeId:string * reason:string * resolutionType:MuteResolution * testName:string -> bool
@@ -730,6 +731,11 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
         member this.CancelBuild(conf:ITeamcityConfiguration, buildUrl:string, requeue:bool) = 
             let content = sprintf "<buildCancelRequest comment='Retrigger' readdIntoQueue='false' />"
+            let result = httpconnector.HttpPostRequestContent(conf, buildUrl, content)
+            result.StatusCode = HttpStatusCode.OK || result.StatusCode = HttpStatusCode.NotFound
+
+        member this.CancelBuild(conf:ITeamcityConfiguration, buildUrl:string, requeue:bool, cancelingComment:string, cancelingApplication:string) = 
+            let content = sprintf "<buildCancelRequest comment='%s Canceled From: %s' readdIntoQueue='false' />" cancelingComment cancelingApplication
             let result = httpconnector.HttpPostRequestContent(conf, buildUrl, content)
             result.StatusCode = HttpStatusCode.OK || result.StatusCode = HttpStatusCode.NotFound
 
