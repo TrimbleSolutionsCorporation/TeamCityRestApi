@@ -730,12 +730,12 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             httpconnector.HttpDeleteRequest(conf, url).Content
 
         member this.CancelBuild(conf:ITeamcityConfiguration, buildUrl:string, requeue:bool) = 
-            let content = sprintf "<buildCancelRequest comment='Retrigger' readdIntoQueue='false' />"
+            let content = sprintf "<buildCancelRequest comment='Retrigger' readdIntoQueue='%b' />" requeue
             let result = httpconnector.HttpPostRequestContent(conf, buildUrl, content)
             result.StatusCode = HttpStatusCode.OK || result.StatusCode = HttpStatusCode.NotFound
 
         member this.CancelBuild(conf:ITeamcityConfiguration, buildUrl:string, requeue:bool, cancelingComment:string, cancelingApplication:string) = 
-            let content = sprintf "<buildCancelRequest comment='%s Canceled From: %s' readdIntoQueue='false' />" cancelingComment cancelingApplication
+            let content = sprintf "<buildCancelRequest comment='%s Canceled From: %s' readdIntoQueue='%b' />" cancelingComment cancelingApplication requeue
             let result = httpconnector.HttpPostRequestContent(conf, buildUrl, content)
             result.StatusCode = HttpStatusCode.OK || result.StatusCode = HttpStatusCode.NotFound
 
