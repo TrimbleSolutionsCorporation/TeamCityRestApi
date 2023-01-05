@@ -534,6 +534,57 @@ type BuildResponse = JsonProvider<"""
     "name": "B-BUILDAGENT53",
     "typeId": 219,
     "href": "/app/rest/agents/id:219"
+},
+"artifacts": {
+    "href": "/app/rest/builds/id:35553629/artifacts/children/"
+},
+"changes": {
+    "change": [
+        {
+            "id": 6970751,
+            "version": "652027068c4e8f87f83581490f701d9546c39a5b",
+            "username": "alex lupu",
+            "date": "20221212T134801+0200",
+            "href": "/app/rest/changes/id:6970751",
+            "webUrl": "https://teamcity.tekla.com/viewModification.html?modId=6970751&personal=false",
+            "comment": "Pull request #69604: TTSD-54683 GetOptionAsString first time its called returns empty string\n\nMerge in TS/structures from feature/TTSD-54683_GetOptionAsString_first_time_its_called_returns_empty_string to master\n\n* commit '75a80a663afbbda61d68b354843ae4046165a7b3':\n  TTSD-54683 fix get option as string\n"
+        },
+        {
+            "id": 6970721,
+            "version": "4e4b0d2d0845dfc93b0be41cafca0badd8f0a26a",
+            "username": "tekla.buildmaster",
+            "date": "20221212T133350+0200",
+            "href": "/app/rest/changes/id:6970721",
+            "webUrl": "https://teamcity.tekla.com/viewModification.html?modId=6970721&personal=false",
+            "comment": "Pull request #69604: TTSD-54683 GetOptionAsString first time its called returns empty string\n\nMerge in TS/structures from feature/TTSD-54683_GetOptionAsString_first_time_its_called_returns_empty_string to master\n\n* commit '75a80a663afbbda61d68b354843ae4046165a7b3':\n  TTSD-54683 fix get option as string\n"
+        }
+    ]
+},
+"resultingProperties": {
+    "count": 2,
+    "property": [
+        {
+            "name": "TAF_DAILY_BUILD_ID",
+            "value": "dsfsd"
+        },
+        {
+            "name": "TAF_DAILY_BUILD_NUMBER",
+            "value": "sdfsd"
+        }
+    ]
+},
+"properties": {
+    "property": [
+        {
+            "name": "BinPath",
+            "value": "%teamcity.build.checkoutDir%\\bin",
+            "inherited": true
+        },
+        {
+            "name": "BitPassword",
+            "value": "******"
+        }
+    ]
 }, "statusText": "asdas", "buildTypeId":"BatTools_BuildAllExtension","number":"72.354","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1884284","webUrl":"http://teamcity/viewLog.html?buildId=1884284&buildTypeId=BatTools_BuildAllExtension"},{"id":1884126,"buildTypeId":"BatTools_BuildAllExtension","number":"71","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1884126","webUrl":"http://teamcity/viewLog.html?buildId=1884126&buildTypeId=BatTools_BuildAllExtension"},{"id":1884121,"buildTypeId":"BatTools_BuildAllExtension","number":"70","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1884121","webUrl":"http://teamcity/viewLog.html?buildId=1884121&buildTypeId=BatTools_BuildAllExtension"},{"id":1883948,"buildTypeId":"BatTools_BuildAllExtension","number":"69a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1883948","webUrl":"http://teamcity/viewLog.html?buildId=1883948&buildTypeId=BatTools_BuildAllExtension"},{"id":1874662,"buildTypeId":"BatTools_BuildAllExtension","number":"68a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1874662","webUrl":"http://teamcity/viewLog.html?buildId=1874662&buildTypeId=BatTools_BuildAllExtension"},{"id":1874061,"buildTypeId":"BatTools_BuildAllExtension","number":"67a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1874061","webUrl":"http://teamcity/viewLog.html?buildId=1874061&buildTypeId=BatTools_BuildAllExtension"},{"id":1839966,"buildTypeId":"BatTools_BuildAllExtension","number":"66a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1839966","webUrl":"http://teamcity/viewLog.html?buildId=1839966&buildTypeId=BatTools_BuildAllExtension"},{"id":1839824,"buildTypeId":"BatTools_BuildAllExtension","number":"65a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1839824","webUrl":"http://teamcity/viewLog.html?buildId=1839824&buildTypeId=BatTools_BuildAllExtension"},{"id":1839802,"buildTypeId":"BatTools_BuildAllExtension","number":"64a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1839802","webUrl":"http://teamcity/viewLog.html?buildId=1839802&buildTypeId=BatTools_BuildAllExtension"},{"id":1782937,"buildTypeId":"BatTools_BuildAllExtension","number":"63a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1782937","webUrl":"http://teamcity/viewLog.html?buildId=1782937&buildTypeId=BatTools_BuildAllExtension"},{"id":1782633,"buildTypeId":"BatTools_BuildAllExtension","number":"62a","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1782633","webUrl":"http://teamcity/viewLog.html?buildId=1782633&buildTypeId=BatTools_BuildAllExtension"},{"id":1770755,"buildTypeId":"BatTools_BuildAllExtension","number":"61a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1770755","webUrl":"http://teamcity/viewLog.html?buildId=1770755&buildTypeId=BatTools_BuildAllExtension"},{"id":1766488,"buildTypeId":"BatTools_BuildAllExtension","number":"60a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1766488","webUrl":"http://teamcity/viewLog.html?buildId=1766488&buildTypeId=BatTools_BuildAllExtension"},{"id":1765126,"buildTypeId":"BatTools_BuildAllExtension","number":"59a","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1765126","webUrl":"http://teamcity/viewLog.html?buildId=1765126&buildTypeId=BatTools_BuildAllExtension"},{"id":1762928,"buildTypeId":"BatTools_BuildAllExtension","number":"58","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1762928","webUrl":"http://teamcity/viewLog.html?buildId=1762928&buildTypeId=BatTools_BuildAllExtension"},{"id":1759246,"buildTypeId":"BatTools_BuildAllExtension","number":"57","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1759246","webUrl":"http://teamcity/viewLog.html?buildId=1759246&buildTypeId=BatTools_BuildAllExtension"},{"id":1758293,"buildTypeId":"BatTools_BuildAllExtension","number":"56","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1758293","webUrl":"http://teamcity/viewLog.html?buildId=1758293&buildTypeId=BatTools_BuildAllExtension"},{"id":1755054,"buildTypeId":"BatTools_BuildAllExtension","number":"55","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1755054","webUrl":"http://teamcity/viewLog.html?buildId=1755054&buildTypeId=BatTools_BuildAllExtension"},{"id":1754574,"buildTypeId":"BatTools_BuildAllExtension","number":"54","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1754574","webUrl":"http://teamcity/viewLog.html?buildId=1754574&buildTypeId=BatTools_BuildAllExtension"},{"id":1753844,"buildTypeId":"BatTools_BuildAllExtension","number":"53","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1753844","webUrl":"http://teamcity/viewLog.html?buildId=1753844&buildTypeId=BatTools_BuildAllExtension"},{"id":1744475,"buildTypeId":"BatTools_BuildAllExtension","number":"52","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1744475","webUrl":"http://teamcity/viewLog.html?buildId=1744475&buildTypeId=BatTools_BuildAllExtension"},{"id":1712522,"buildTypeId":"BatTools_BuildAllExtension","number":"51","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1712522","webUrl":"http://teamcity/viewLog.html?buildId=1712522&buildTypeId=BatTools_BuildAllExtension"},{"id":1708392,"buildTypeId":"BatTools_BuildAllExtension","number":"50","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1708392","webUrl":"http://teamcity/viewLog.html?buildId=1708392&buildTypeId=BatTools_BuildAllExtension"},{"id":1706955,"buildTypeId":"BatTools_BuildAllExtension","number":"49","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1706955","webUrl":"http://teamcity/viewLog.html?buildId=1706955&buildTypeId=BatTools_BuildAllExtension"},{"id":1706275,"buildTypeId":"BatTools_BuildAllExtension","number":"48","status":"SUCCESS","state":"finished","href":"/httpAuth/app/rest/builds/id:1706275","webUrl":"http://teamcity/viewLog.html?buildId=1706275&buildTypeId=BatTools_BuildAllExtension"},{"id":1690735,"buildTypeId":"BatTools_BuildAllExtension","number":"47","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1690735","webUrl":"http://teamcity/viewLog.html?buildId=1690735&buildTypeId=BatTools_BuildAllExtension"},{"id":1674764,"buildTypeId":"BatTools_BuildAllExtension","number":"46","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1674764","webUrl":"http://teamcity/viewLog.html?buildId=1674764&buildTypeId=BatTools_BuildAllExtension"},{"id":1673575,"buildTypeId":"BatTools_BuildAllExtension","number":"45","status":"FAILURE","state":"finished","href":"/httpAuth/app/rest/builds/id:1673575","webUrl":"http://teamcity/viewLog.html?buildId=1673575&buildTypeId=BatTools_BuildAllExtension"}]} """>
 
 type SingleBuildResponse = JsonProvider<"""

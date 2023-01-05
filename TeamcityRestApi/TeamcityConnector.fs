@@ -41,28 +41,17 @@ type ITeamcityConnector =
   abstract member GetTestsForBuild : ConnectionConfiguration:ITeamcityConfiguration * build:TcBuild -> unit
 
   abstract member GetTest : conf:ITeamcityConfiguration * testId:string -> TcTest
-
-  abstract member GetBuildsBranch : ConnectionConfiguration:ITeamcityConfiguration * buildConf:TCBuildConfigurationType * nmbBuild:int * branch:string * skipChanges:bool -> System.Collections.Generic.List<TcBuild>
-  abstract member GetBuildsBranch : ConnectionConfiguration:ITeamcityConfiguration * buildConf:TCBuildConfigurationType * nmbBuild:int * branch:string * skipChanges:bool * getartifacts:bool -> System.Collections.Generic.List<TcBuild>
-  abstract member GetBuildsBranch : ConnectionConfiguration:ITeamcityConfiguration * buildConf:TCBuildConfigurationType * nmbBuild:int * branch:string * skipChanges:bool * getartifacts:bool * getResultProps:bool -> System.Collections.Generic.List<TcBuild>
-
-  abstract member GetBuildsBranch : ConnectionConfiguration:ITeamcityConfiguration * buildConfId:string * nmbBuild:int * branch:string * skipChanges:bool -> System.Collections.Generic.List<TcBuild>
-  abstract member GetBuildsBranch : ConnectionConfiguration:ITeamcityConfiguration * buildConfId:string * nmbBuild:int * branch:string * skipChanges:bool * getartifacts:bool -> System.Collections.Generic.List<TcBuild>
-  abstract member GetBuildsBranch : ConnectionConfiguration:ITeamcityConfiguration * buildConfId:string * nmbBuild:int * branch:string * skipChanges:bool * getartifacts:bool * getResultProps:bool -> System.Collections.Generic.List<TcBuild>
-  abstract member GetBuildsBranch : ConnectionConfiguration:ITeamcityConfiguration * buildConfId:string * nmbBuild:int * branch:string * skipChanges:bool * getartifacts:bool * getResultProps:bool * getTests:bool -> System.Collections.Generic.List<TcBuild>
-  abstract member GetBuildsBranch : ConnectionConfiguration:ITeamcityConfiguration * buildConfId:string * nmbBuild:int * branch:string * skipChanges:bool * getartifacts:bool * getResultProps:bool * getTests:bool * getProblems:bool -> System.Collections.Generic.List<TcBuild>
   
   abstract member GetCanceledBuilds : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string -> System.Collections.Generic.List<TcBuild>
 
-  abstract member GetBuildsFromBuildCondiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string -> System.Collections.Generic.List<TcBuild>
-  abstract member GetBuildsFromBuildCondiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string * detailedChagnes:bool -> System.Collections.Generic.List<TcBuild>  
-  abstract member GetBuildsFromBuildCondiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string * detailedChagnes:bool * getTests:bool -> System.Collections.Generic.List<TcBuild>  
-  abstract member GetBuildsFromBuildCondiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string * detailedChagnes:bool * getTests:bool * lookupLimit:int -> System.Collections.Generic.List<TcBuild>  
-  abstract member GetBuildsFromBuildCondiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string * detailedChagnes:bool * getTests:bool * lookupLimit:int * retResultProps:bool -> System.Collections.Generic.List<TcBuild>  
-  abstract member GetBuildInfoFromBuildCondiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string * lookupLimit:int -> System.Collections.Generic.List<TcBuild>
-
-  abstract member GetBuilds : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string * detailedChagnes:bool * lookupLimit:int  -> System.Collections.Generic.List<TcBuild>
-
+  abstract member GetBuildsFromBuildConfiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string -> System.Collections.Generic.List<TcBuild>
+  abstract member GetBuildsFromBuildConfiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string * getTests:bool * lookupLimit:int * getProps:bool * getResultingProps:bool * getartifacts:bool * getProblems:bool  -> System.Collections.Generic.List<TcBuild>
+  abstract member GetBuildsFromBuildConfiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string * getTests:bool * lookupLimit:int * getProps:bool * getResultingProps:bool * getartifacts:bool * getProblems:bool * ?fromDate:DateTime * ?untilDate:DateTime -> System.Collections.Generic.List<TcBuild>
+ 
+  abstract member GetBuildInfoFromBuildConfiguration : conf:ITeamcityConfiguration * buildConf:string * branch:string -> System.Collections.Generic.List<TcBuild>
+  abstract member GetBuildInfoFromBuildConfiguration : conf:ITeamcityConfiguration * buildConf:string * branch:string * regxForResultProps:string * lookupLimitLocator:int -> System.Collections.Generic.List<TcBuild>
+  abstract member GetBuildInfoFromBuildConfiguration : conf:ITeamcityConfiguration * buildConf:string * branch:string * regxForResultProps:string * lookupLimitLocator:int * ?fromDate:DateTime * ?untilDate:DateTime -> System.Collections.Generic.List<TcBuild>
+  
   abstract member GetFailedBuildsFromProject : ConnectionConfiguration:ITeamcityConfiguration * ProjectName:string * branch:string -> System.Collections.Generic.List<TcBuild>
   abstract member GetLastBuildsFromProject : ConnectionConfiguration:ITeamcityConfiguration * ProjectName:string * branch:string -> System.Collections.Generic.List<TcBuild>
   abstract member GetLastBuildFromBuildConfiguration : ConnectionConfiguration:ITeamcityConfiguration * ProjectName:string * branch:string -> System.Collections.Generic.List<TcBuild>
@@ -330,16 +319,133 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                    build.Problems.Add(newProblem)
         with | ex -> ()
 
-    let GetResultingProps(build:TcBuild,conf:ITeamcityConfiguration)=
+    let GetResultingProps(build:TcBuild, conf:ITeamcityConfiguration)=
         try
-        let buildurlResultingProps = build.Href + "/resulting-properties"
-        let resultingProps = ResultingProperties.Parse(httpconnector.HttpRequest(conf, buildurlResultingProps, RestSharp.Method.Get).Content)
-        for prop in resultingProps.Property do
-            let propToBuild = BuildProperty()
-            propToBuild.Name <- prop.Name
-            propToBuild.Value <- prop.Value
-            build.ResultingProperties.Add(propToBuild)
+            let buildurlResultingProps = build.Href + "/resulting-properties"
+            let resultingProps = ResultingProperties.Parse(httpconnector.HttpRequest(conf, buildurlResultingProps, RestSharp.Method.Get).Content)
+            for prop in resultingProps.Property do
+                let propToBuild = BuildProperty()
+                propToBuild.Name <- prop.Name
+                propToBuild.Value <- prop.Value
+                build.ResultingProperties.Add(propToBuild)
         with ex -> ()
+
+    let GetAdditionBuildInformationforBuildTypes(
+        baseApi:string,
+        conf:ITeamcityConfiguration,
+        branch:string,
+        getTests:bool,
+        getProps:bool,
+        getResultingProps:bool,
+        getProblems: bool,
+        includeArtifacts: bool,
+        regxForResultProps:string) =
+        
+        let regxForResultingProps =
+            if regxForResultProps <> "" then
+                sprintf ",resultingProperties($locator(name:(value:(%s),matchType:matches)),property)" regxForResultProps
+            else
+                ""
+
+        let fieldsToGet =
+            if getProps then
+                sprintf "&fields=build(id,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,artifacts,changes(change(comment,version,username,date,href,webUrl)),branchName,comment,agent,buildType,properties(property)%s)" regxForResultingProps
+            else
+                sprintf "&fields=build(id,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,artifacts,changes(change(comment,version,username,date,href,webUrl)),branchName,comment,agent,buildType%s)" regxForResultingProps
+
+        let buildurl = baseApi + fieldsToGet
+        let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
+
+        let builds = System.Collections.Generic.List<TcBuild>()
+        for build in data.Build do
+            let newBuild = new TcBuild()
+
+            newBuild.Href <- build.Href
+            if build.BuildType.IsSome then
+                newBuild.BuildTypeId <- build.BuildType.Value.Id
+                newBuild.BuildConfigurationId <- build.BuildType.Value.Id
+            else
+                newBuild.BuildTypeId <- build.BuildTypeId
+                newBuild.BuildConfigurationId <- build.BuildTypeId
+
+            newBuild.Id <- build.Id.ToString()
+            newBuild.Number <- build.Number.String.Value
+            newBuild.State <- build.State
+            newBuild.Status <- build.Status
+            newBuild.WebUrl <- build.WebUrl
+            newBuild.StatusText <- if build.StatusText.IsSome then build.StatusText.Value else ""
+            newBuild.Branch <- branch
+
+            
+            newBuild.BuildConfigurationName <- build.BuildType.Value.Name
+            if build.QueuedDate.IsSome then
+                newBuild.QueuedTime <- ParseDate(build.QueuedDate.Value)
+            if build.StartDate.IsSome then
+                newBuild.StartTime <- ParseDate(build.StartDate.Value)
+            if build.FinishDate.IsSome then
+                newBuild.EndTime <- ParseDate(build.FinishDate.Value)
+            newBuild.Comment <- if build.Comment.IsSome then build.Comment.Value.Text else ""
+            if build.Agent.IsSome then
+                newBuild.AgentId <- string build.Agent.Value.TypeId
+                newBuild.AgentName <- build.Agent.Value.Name
+                
+            if getProps then
+                if build.Properties.IsSome then
+                    for prop in build.Properties.Value.Property do
+                        let propToBuild = BuildProperty()
+                        propToBuild.Name <- prop.Name
+                        if prop.Inherited.IsSome then
+                            propToBuild.Inherited <- prop.Inherited.Value
+                        propToBuild.Value <- prop.Value
+                        newBuild.Properties.Add(propToBuild)
+            
+            if getResultingProps then
+                GetResultingProps(newBuild,conf)
+            else
+                if build.ResultingProperties.IsSome then
+                    for prop in build.ResultingProperties.Value.Property do
+                        let propToBuild = BuildProperty()
+                        propToBuild.Name <- prop.Name
+                        propToBuild.Value <- prop.Value
+                        newBuild.ResultingProperties.Add(propToBuild)                        
+
+            if getTests then
+                GetTests(newBuild, conf, false)
+            if getProblems then
+                GetProblems(newBuild, conf)
+
+            if includeArtifacts then
+                let responseContent = httpconnector.HttpRequest(conf, build.Artifacts.Value.Href, RestSharp.Method.Get).Content
+                let restponseArtifacts = ArtifactsPathResponse.Parse(responseContent)
+                if restponseArtifacts.Count <> 0 then
+                    for artifactElem in restponseArtifacts.File do
+                        let artifcat = new Artifact()
+                        artifcat.FileName <- artifactElem.Name
+                        newBuild.Artifacts.Add(artifcat)
+
+            if build.Changes.IsSome then
+                let mutable changeLog = ""
+                for change in build.Changes.Value.Change do                    
+                    let changedata = Change()
+                    changedata.Date <- change.Date
+                    changedata.Href <- change.Href
+                    changedata.UserName <- change.Username
+                    changedata.Version <- change.Version
+                    changedata.WebUrl <- change.WebUrl
+                    changedata.Comment <- change.Comment
+
+                    newBuild.ChangesData.Add(changedata)                    
+
+                    if newBuild.Revision = "" || newBuild.Revision = null then
+                        newBuild.Revision <- change.Version
+                   
+                    changeLog <- changeLog +  change.Version + " : " + change.Username + " : " + change.Comment + "\r\n"
+
+                newBuild.Changes <- changeLog
+                
+            builds.Add(newBuild)
+
+        builds
 
     let toMap dictionary = 
         (dictionary :> seq<_>)
@@ -896,8 +1002,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                     changedata.Id <- sprintf "%i" change.Id
                     changedata.UserName <- change.Username
                     changedata.Version <- change.Version
-                    changedata.WebUrl <- change.WebUrl
-    
+                    changedata.WebUrl <- change.WebUrl    
                     let changeComment = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
                     changedata.Comment <- changeComment.Comment
                     changes.Add(changedata)
@@ -1028,6 +1133,10 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                             changedata.UserName <- change.Username
                             changedata.Version <- change.Version
                             changedata.WebUrl <- change.WebUrl
+                            
+                            if newBuild.Revision = "" || newBuild.Revision = null then
+                                newBuild.Revision <- change.Version
+
                             if change.Files.Count <> 0 then
                                 for file in change.Files.File do 
                                     changedata.ListofChangedFiles.Add(file.File)
@@ -1046,319 +1155,6 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 GetProblems(newBuild,conf)
             newBuild
 
-        member this.GetBuildsBranch(conf:ITeamcityConfiguration,
-                                    buildConf:string,
-                                    nmbBuild:int,
-                                    branch:string,
-                                    skipChanges:bool) =
-            (this :> ITeamcityConnector).GetBuildsBranch(conf,
-                                                buildConf,
-                                                nmbBuild,
-                                                branch,
-                                                skipChanges,
-                                                false,
-                                                false,
-                                                false,
-                                                false)
-
-        member this.GetBuildsBranch(conf:ITeamcityConfiguration,
-                                    buildConf:string,
-                                    nmbBuild:int,
-                                    branch:string,
-                                    skipChanges:bool,
-                                    includeArtifacts:bool) =
-            (this :> ITeamcityConnector).GetBuildsBranch(conf,
-                                                buildConf,
-                                                nmbBuild,
-                                                branch,
-                                                skipChanges,
-                                                includeArtifacts,
-                                                false,
-                                                false,
-                                                false) 
-
-        member this.GetBuildsBranch(conf:ITeamcityConfiguration,
-                                    buildConf:string,
-                                    nmbBuild:int,
-                                    branch:string,
-                                    skipChanges:bool,
-                                    includeArtifacts:bool,
-                                    getResultProps:bool) =
-            (this :> ITeamcityConnector).GetBuildsBranch(conf,
-                                                buildConf,
-                                                nmbBuild,
-                                                branch,
-                                                skipChanges,
-                                                includeArtifacts,
-                                                getResultProps,
-                                                false,
-                                                false) 
-
-        member this.GetBuildsBranch(conf:ITeamcityConfiguration,
-                                                buildConf:string,
-                                                nmbBuild:int,
-                                                branch:string,
-                                                skipChanges:bool,
-                                                includeArtifacts:bool,
-                                                getResultProps:bool,
-                                                getTests:bool) =
-           (this :> ITeamcityConnector).GetBuildsBranch(conf,
-                                                 buildConf,
-                                                 nmbBuild,
-                                                 branch,
-                                                 skipChanges,
-                                                 includeArtifacts,
-                                                 getResultProps,
-                                                 getTests,
-                                                 false)
-
-        member this.GetBuildsBranch(conf:ITeamcityConfiguration,
-                                    buildConf:string,
-                                    nmbBuild:int,
-                                    branch:string,
-                                    skipChanges:bool,
-                                    includeArtifacts:bool,
-                                    getResultProps:bool,
-                                    getTests:bool,
-                                    getProblems:bool) =
-            let builds = System.Collections.Generic.List<TcBuild>()
-            try
-                let getBranchLocator() = 
-                    if branch = "" then
-                        ""
-                    else
-                        ",branch:" + branch
-
-                let lookupLimitLocator =
-                    if nmbBuild = -1 then
-                        ""
-                    else
-                        "lookupLimit:" + nmbBuild.ToString() + ","
-
-                let buildurl = "/app/rest/builds/" + "?locator=" + lookupLimitLocator + "running:any," + "buildType:" + buildConf + getBranchLocator()
-                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
-
-                if data.Count > 0 then
-                    for build in data.Build do
-                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.Get).Content
-                        let fullBuildData = UniqueBuildResponse.Parse(contentString)
-                        let newBuild = new TcBuild()
-                        newBuild.Href <- fullBuildData.Href
-                        newBuild.BuildTypeId <- build.BuildTypeId
-                        newBuild.Id <- fullBuildData.Id
-                        newBuild.Number <- build.Number.String.Value
-                        newBuild.State <- fullBuildData.State
-                        newBuild.Status <- fullBuildData.Status
-                        newBuild.StatusText <- fullBuildData.StatusText
-                        newBuild.WebUrl <- fullBuildData.WebUrl
-                        newBuild.Branch <- branch
-                        newBuild.BuildConfigurationId <- fullBuildData.BuildType.Id
-                        newBuild.BuildConfigurationName <- fullBuildData.BuildType.Name
-
-                        
-                        if fullBuildData.JsonValue.ToString().Contains("\"problemOccurrences\":") then
-                            newBuild.ProblemOccurrencesCount <- try fullBuildData.ProblemOccurrences.Count with | _ -> 0
-                            newBuild.ProblemOccurrencesHref <- try fullBuildData.ProblemOccurrences.Href with | _ -> ""
-
-                        newBuild.QueuedTime <- ParseDate(fullBuildData.QueuedDate)
-                        newBuild.StartTime <- ParseDate(fullBuildData.StartDate)
-                        newBuild.EndTime <- ParseDate(fullBuildData.FinishDate)
-                        if fullBuildData.JsonValue.ToString().Contains("\"comment\":") then
-                            newBuild.Comment <- try fullBuildData.Comment.Text with | _ -> ""
-
-                        if contentString.Contains("\"agent\":") then
-                            if fullBuildData.Agent.JsonValue.ToString().Contains("\"typeId\":") then
-                                newBuild.AgentId <- string fullBuildData.Agent.TypeId
-                            if fullBuildData.Agent.JsonValue.ToString().Contains("\"id\":") then
-                                newBuild.AgentId <- string fullBuildData.Agent.Id
-
-                            newBuild.AgentName <- if contentString.Contains("agent") then try fullBuildData.Agent.Name with | _ -> "" else ""
-
-
-                        if getTests then
-                            GetTests(newBuild, conf, false)
-                        if getProblems then
-                            GetProblems(newBuild,conf)
-                        try
-                            for prop in fullBuildData.Properties.Property do
-                                let propToBuild = BuildProperty()
-                                propToBuild.Name <- prop.Name
-                                if prop.Inherited.IsSome then
-                                    propToBuild.Inherited <- prop.Inherited.Value
-                                propToBuild.Value <- prop.Value
-                                newBuild.Properties.Add(propToBuild)
-
-                            if getResultProps then
-                                GetResultingProps(newBuild,conf)
-                        with
-                        | ex -> System.Diagnostics.Debug.WriteLine(ex.Message)
-                                System.Diagnostics.Debug.WriteLine(ex.StackTrace)
-
-                        if includeArtifacts then
-                            let responseContent = httpconnector.HttpRequest(conf, fullBuildData.Artifacts.Href, RestSharp.Method.Get).Content
-                            let restponseArtifacts = ArtifactsPathResponse.Parse(responseContent)
-                            if restponseArtifacts.Count <> 0 then
-                                for artifactElem in restponseArtifacts.File do
-                                    let artifcat = new Artifact()
-                                    artifcat.FileName <- artifactElem.Name
-                                    newBuild.Artifacts.Add(artifcat)
-
-                        if not(skipChanges) then
-                            let mutable changeLog = ""
-                            try
-                                if fullBuildData.LastChanges.Count <> 0 then
-                                    for change in fullBuildData.LastChanges.Change do
-                                        let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
-                                        let changedata = Change()
-                                        changedata.Date <- change.Date
-                                        changedata.Href <- change.Href
-                                        changedata.Id <- sprintf "%i" change.Id
-                                        changedata.UserName <- change.Username
-                                        changedata.Version <- change.Version
-                                        changedata.WebUrl <- change.WebUrl
-                                        changedata.Comment <- change.Comment
-                                        changedata.Version <- change.Version
-                                        newBuild.ChangesData.Add(changedata)
-                                        changeLog <- changeLog + change.Username + " : " + change.Comment + "\r\n"
-                            with
-                            | ex -> ()
-                            newBuild.Changes <- changeLog
-
-                        //let changes = GetChanges()
-                        builds.Add(newBuild)
-
-            with
-            | ex -> ()
-
-            builds
-
-        member this.GetBuildsBranch(conf:ITeamcityConfiguration,
-                                    buildConf:TCBuildConfigurationType,
-                                    nmbBuild:int,
-                                    branch:string,
-                                    skipChanges:bool) =
-            (this :> ITeamcityConnector).GetBuildsBranch(conf, buildConf, nmbBuild, branch, skipChanges, false, false)
-
-        member this.GetBuildsBranch(conf:ITeamcityConfiguration,
-                                    buildConf:TCBuildConfigurationType,
-                                    nmbBuild:int,
-                                    branch:string,
-                                    skipChanges:bool,
-                                    getArtifacts:bool) =
-            (this :> ITeamcityConnector).GetBuildsBranch(conf, buildConf, nmbBuild, branch, skipChanges, getArtifacts, false)
-
-        member this.GetBuildsBranch(conf:ITeamcityConfiguration,
-                                    buildConf:TCBuildConfigurationType,
-                                    nmbBuild:int,
-                                    branch:string,
-                                    skipChanges:bool,
-                                    getArtifacts:bool,
-                                    getResultProps:bool) =
-            let builds = System.Collections.Generic.List<TcBuild>()
-            try
-                let getBranchLocator() = 
-                    if buildConf.BranchLocator <> "" then
-                        buildConf.BranchLocator
-                    else
-                        if branch = "" then
-                            ""
-                        else
-                            ",branch:" + branch
-
-                let lookupLimitLocator =
-                    if nmbBuild = -1 then
-                        ""
-                    else
-                        "lookupLimit:" + nmbBuild.ToString() + ","
-
-                let buildurl = buildConf.BuildIdRef + "?locator=" + lookupLimitLocator + "running:any" + getBranchLocator()
-                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
-
-                if data.Count > 0 then
-                    for build in data.Build do
-                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.Get).Content
-                        let fullBuildData = UniqueBuildResponse.Parse(contentString)
-                        let newBuild = new TcBuild()
-                        newBuild.Artifact <- buildConf.Artifact
-                        newBuild.ArtifactHref <- fullBuildData.Artifacts.Href
-                        newBuild.Configuration <- buildConf.Configuration
-                        newBuild.Platform <- buildConf.Platform
-                        newBuild.Href <- fullBuildData.Href
-                        newBuild.BuildTypeId <- build.BuildTypeId
-                        newBuild.Id <- fullBuildData.Id
-                        newBuild.Number <- build.Number.String.Value
-                        newBuild.State <- fullBuildData.State
-                        newBuild.Status <- fullBuildData.Status
-                        newBuild.WebUrl <- fullBuildData.WebUrl
-                        newBuild.Branch <- branch
-                        newBuild.BuildConfigurationId <- fullBuildData.BuildType.Id
-                        newBuild.BuildConfigurationName <- fullBuildData.BuildType.Name
-                        newBuild.QueuedTime <- ParseDate(fullBuildData.QueuedDate)
-                        newBuild.StartTime <- ParseDate(fullBuildData.StartDate)
-                        newBuild.EndTime <- ParseDate(fullBuildData.FinishDate)
-                        newBuild.Comment <- try fullBuildData.Comment.Text with | _ -> ""
-
-                        if contentString.Contains("\"agent\":") then
-                            if fullBuildData.Agent.JsonValue.ToString().Contains("\"typeId\":") then
-                                newBuild.AgentId <- string fullBuildData.Agent.TypeId
-                            if fullBuildData.Agent.JsonValue.ToString().Contains("\"id\":") then
-                                newBuild.AgentId <- string fullBuildData.Agent.Id
-
-                            newBuild.AgentName <- if contentString.Contains("agent") then try fullBuildData.Agent.Name with | _ -> "" else ""
-
-
-
-                        try
-                            for prop in fullBuildData.Properties.Property do
-                                let propToBuild = BuildProperty()
-                                propToBuild.Name <- prop.Name
-                                if prop.Inherited.IsSome then
-                                    propToBuild.Inherited <- prop.Inherited.Value
-                                propToBuild.Value <- prop.Value
-                                newBuild.Properties.Add(propToBuild)
-
-                            if getResultProps then
-                                GetResultingProps(newBuild,conf)
-
-                        with
-                        | _ -> ()
-
-                        if getArtifacts then
-                            let restponseArtifacts = ArtifactsPathResponse.Parse(httpconnector.HttpRequest(conf, fullBuildData.Artifacts.Href, RestSharp.Method.Get).Content)
-                            if restponseArtifacts.Count <> 0 then
-                                for artifactElem in restponseArtifacts.File do
-                                    let artifcat = new Artifact()
-                                    artifcat.FileName <- artifactElem.Name
-                                    newBuild.Artifacts.Add(artifcat)
-
-                        if not(skipChanges) then
-                            let mutable changeLog = ""
-                            try
-                                if fullBuildData.LastChanges.Count <> 0 then
-                                    for change in fullBuildData.LastChanges.Change do
-                                        let change = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
-                                        let changedata = Change()
-                                        changedata.Date <- change.Date
-                                        changedata.Href <- change.Href
-                                        changedata.Id <- sprintf "%i" change.Id
-                                        changedata.UserName <- change.Username
-                                        changedata.Version <- change.Version
-                                        changedata.WebUrl <- change.WebUrl
-                                        changedata.Comment <- change.Comment
-                                        changedata.Version <- change.Version
-                                        newBuild.ChangesData.Add(changedata)
-                                        changeLog <- changeLog + change.Username + " : " + change.Comment + "\r\n"
-                            with
-                            | ex -> ()
-                            newBuild.Changes <- changeLog
-
-                        //let changes = GetChanges()
-                        builds.Add(newBuild)
-
-            with
-            | ex -> ()
-
-            builds
 
         member this.GetFailedBuildsFromConfiguration(conf:ITeamcityConfiguration, buildConfig:string, branch:string) =
 
@@ -1450,28 +1246,31 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             let dataAnswer = dataS.Content
             let builds = System.Collections.Generic.List<TcBuild>()
             if dataAnswer <> "" then
-                let dataFirst = QueryFailedBuilds.Parse(dataAnswer)            
-                if dataAnswer.Contains("\"buildType\":") && dataAnswer.Contains("\"builds\":") then
-                    for buildtype in dataFirst.BuildType do
-                        for build in buildtype.Builds.Build do
-                            let newBuild = new TcBuild()
-                            newBuild.BuildConfigurationName <- buildtype.Name.Value
-                            newBuild.Href <- build.Href
-                            newBuild.BuildTypeId <- build.BuildTypeId
-                            newBuild.Id <- build.Id.ToString()
-                            newBuild.Number <- build.Number.ToString()
-                            newBuild.State <- build.State
-                            newBuild.StatusText <- if dataAnswer.Contains("\"statusText\":") then try build.StatusText with | _ -> "" else ""
-                            newBuild.Status <- build.Status
-                            newBuild.WebUrl <- build.WebUrl
-                            newBuild.Branch <- build.BranchName
-                            if build.Comment.IsSome then
-                                newBuild.Comment <- build.Comment.Value.Text
+                try
+                    let dataFirst = QueryFailedBuilds.Parse(dataAnswer)                            
+                    if dataAnswer.Contains("\"buildType\":") && dataAnswer.Contains("\"builds\":") then
+                        for buildtype in dataFirst.BuildType do
+                            for build in buildtype.Builds.Build do
+                                let newBuild = new TcBuild()
+                                newBuild.BuildConfigurationName <- buildtype.Name.Value
+                                newBuild.Href <- build.Href
+                                newBuild.BuildTypeId <- build.BuildTypeId
+                                newBuild.Id <- build.Id.ToString()
+                                newBuild.Number <- build.Number.ToString()
+                                newBuild.State <- build.State
+                                newBuild.StatusText <- if dataAnswer.Contains("\"statusText\":") then try build.StatusText with | _ -> "" else ""
+                                newBuild.Status <- build.Status
+                                newBuild.WebUrl <- build.WebUrl
+                                newBuild.Branch <- build.BranchName
+                                if build.Comment.IsSome then
+                                    newBuild.Comment <- build.Comment.Value.Text
 
-                            newBuild.StartTime <- DateTime.ParseExact(build.StartDate.Value.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture)
-                            newBuild.QueuedTime <- DateTime.ParseExact(build.QueuedDate.Value.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture)
-                            newBuild.EndTime <- DateTime.ParseExact(build.FinishDate.Value.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture)
-                            builds.Add(newBuild)
+                                newBuild.StartTime <- DateTime.ParseExact(build.StartDate.Value.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture)
+                                newBuild.QueuedTime <- DateTime.ParseExact(build.QueuedDate.Value.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture)
+                                newBuild.EndTime <- DateTime.ParseExact(build.FinishDate.Value.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture)
+                                builds.Add(newBuild)
+                with
+                | _ -> ()
             builds
 
         member this.GetFailedBuildsFromProject(conf:ITeamcityConfiguration, projectName:string, branch:string) =
@@ -1503,42 +1302,20 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
             builds
 
-        member this.GetBuildsFromBuildCondiguration(conf:ITeamcityConfiguration,
-                                                    buildConf:string,
-                                                    branch:string) =
-                (this :> ITeamcityConnector).GetBuildsFromBuildCondiguration(conf, buildConf, branch, true, false, 1000)
+        member this.GetBuildsFromBuildConfiguration(conf:ITeamcityConfiguration,
+                buildConf:string,
+                branch:string) =
+                (this :> ITeamcityConnector).GetBuildsFromBuildConfiguration(conf, buildConf, branch, false, 100, false, false, false, false)
 
-        member this.GetBuildsFromBuildCondiguration(conf:ITeamcityConfiguration,
-                                                    buildConf:string,
-                                                    branch:string,
-                                                    getdetailedChangeLog:bool) =
-                (this :> ITeamcityConnector).GetBuildsFromBuildCondiguration(conf, buildConf, branch, getdetailedChangeLog, false, 1000)
-                                                
-
-        member this.GetBuildsFromBuildCondiguration(conf:ITeamcityConfiguration,
-                                                    buildConf:string,
-                                                    branch:string,
-                                                    getdetailedChangeLog:bool,
-                                                    getTests:bool) =
-                (this :> ITeamcityConnector).GetBuildsFromBuildCondiguration(conf, buildConf, branch, getdetailedChangeLog, getTests, 1000)
-
-        member this.GetBuildsFromBuildCondiguration(conf:ITeamcityConfiguration,
-                                                    buildConf:string,
-                                                    branch:string,
-                                                    getdetailedChangeLog:bool,
-                                                    getTests:bool,
-                                                    lookupLimitLocator:int) =
-                (this :> ITeamcityConnector).GetBuildsFromBuildCondiguration(conf, buildConf, branch, getdetailedChangeLog, getTests, lookupLimitLocator, false)
-
-
-
-        member this.GetBuildsFromBuildCondiguration(conf:ITeamcityConfiguration,
-                                                    buildConf:string,
-                                                    branch:string,
-                                                    getdetailedChangeLog:bool,
-                                                    getTests:bool,
-                                                    lookupLimitLocator:int,
-                                                    getResultProps:bool) =
+        member this.GetBuildsFromBuildConfiguration(conf:ITeamcityConfiguration,
+                buildConf:string,
+                branch:string,
+                getTests:bool,
+                lookupLimitLocator:int,
+                getProps:bool,
+                getResultingProps:bool,
+                getArtifacts:bool,
+                getProblems:bool) =
 
             let lookupLimitLocatorToUse =
                 sprintf "lookupLimit:%i," lookupLimitLocator
@@ -1549,98 +1326,42 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 else
                     ""
 
-            let builds = System.Collections.Generic.List<TcBuild>()
-            try
-                let getBranchLocator() = 
-                    if branch = "" then
-                        ""
-                    else
-                        ",branch:" + branch
+            let branchLocator = 
+                if branch = "" then
+                    ""
+                else
+                    ",branch:" + branch
 
-                let buildurl = "/app/rest/builds/" + "?locator=" + lookupLimitLocatorToUse + "buildType:" + buildConf + getBranchLocator() + deepLimitLocator
-                let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
+            let buildurl = "/app/rest/builds/?locator=" + lookupLimitLocatorToUse + "buildType:" + buildConf + branchLocator + deepLimitLocator
 
-                if data.Count > 0 then
-                    for build in data.Build do
-                        let contentString = httpconnector.HttpRequest(conf, build.Href, RestSharp.Method.Get).Content
-                        let fullBuildData = UniqueBuildResponse.Parse(contentString)
-                        let newBuild = new TcBuild()
-                        newBuild.Href <- fullBuildData.Href
-                        newBuild.BuildTypeId <- build.BuildTypeId
-                        newBuild.Id <- fullBuildData.Id
-                        newBuild.Number <- build.Number.String.Value
-                        newBuild.State <- fullBuildData.State
-                        newBuild.Status <- fullBuildData.Status
-                        newBuild.WebUrl <- fullBuildData.WebUrl
-                        newBuild.StatusText <- if contentString.Contains("statusText") then fullBuildData.StatusText else ""
-                        newBuild.Branch <- branch
-                        newBuild.BuildConfigurationId <- fullBuildData.BuildType.Id
-                        newBuild.BuildConfigurationName <- fullBuildData.BuildType.Name
-                        newBuild.QueuedTime <- ParseDate(fullBuildData.QueuedDate)
-                        newBuild.StartTime <- ParseDate(fullBuildData.StartDate)
-                        newBuild.EndTime <- ParseDate(fullBuildData.FinishDate)
-                        if contentString.Contains("\"comment\":") then
-                            newBuild.Comment <- try fullBuildData.Comment.Text with | _ -> ""
+            GetAdditionBuildInformationforBuildTypes(buildurl, conf, branch, getTests, getProps, getResultingProps, getArtifacts, getProblems, "")
 
-                        if contentString.Contains("\"agent\":") then
-                            if fullBuildData.Agent.JsonValue.ToString().Contains("\"typeId\":") then
-                                newBuild.AgentId <- string fullBuildData.Agent.TypeId
-                            if fullBuildData.Agent.JsonValue.ToString().Contains("\"id\":") then
-                                newBuild.AgentId <- string fullBuildData.Agent.Id
-
-                            newBuild.AgentName <- if contentString.Contains("agent") then try fullBuildData.Agent.Name with | _ -> "" else ""
-
-                        try
-                            for prop in fullBuildData.Properties.Property do
-                                let propToBuild = BuildProperty()
-                                propToBuild.Name <- prop.Name
-                                if prop.Inherited.IsSome then
-                                    propToBuild.Inherited <- prop.Inherited.Value
-                                propToBuild.Value <- prop.Value
-                                newBuild.Properties.Add(propToBuild)
-
-                            if getResultProps then
-                                GetResultingProps(newBuild,conf)
-
-                        with
-                        | _ -> ()
-
-                        if getTests then
-                           GetTests(newBuild, conf, false)
-                        if getdetailedChangeLog then
-                            let mutable changeLog = ""
-                            let replyChangeData = Changes.Parse(httpconnector.HttpRequest(conf, fullBuildData.Changes.Href, RestSharp.Method.Get).Content)
-                            try
-                                if replyChangeData.Count > 0 then
-                                    for change in replyChangeData.Change do
-                                        let replyChangeDataUnique = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
-                                        let changedata = Change()
-                                        changedata.Date <- replyChangeDataUnique.Date
-                                        changedata.Href <- replyChangeDataUnique.Href
-                                        changedata.Id <- sprintf "%i" replyChangeDataUnique.Id
-                                        changedata.UserName <- replyChangeDataUnique.Username
-                                        changedata.Version <- replyChangeDataUnique.Version
-                                        changedata.WebUrl <- replyChangeDataUnique.WebUrl
-                                        changedata.Comment <- replyChangeDataUnique.Comment
-                                        changedata.Version <- replyChangeDataUnique.Version
-                                        newBuild.ChangesData.Add(changedata)
-                                        changeLog <- changeLog + replyChangeDataUnique.Username + " : " + replyChangeDataUnique.Comment + "\r\n"
-                            with ex -> ()
-                            newBuild.Changes <- changeLog
-                        builds.Add(newBuild)
-            with
-            | ex -> ()
-
-            builds
-
-        member this.GetBuilds(conf:ITeamcityConfiguration,
-                                buildConf:string,
-                                branch:string,
-                                getdetailedChangeLog:bool,
-                                lookupLimitLocator:int) =
+        member this.GetBuildsFromBuildConfiguration(conf:ITeamcityConfiguration,
+            buildConf:string,
+            branch:string,
+            getTests:bool,
+            lookupLimitLocator:int,
+            getProps:bool,
+            getResultingProps:bool,
+            getArtifacts:bool,
+            getProblems:bool,
+            ?sinceDate:DateTime,
+            ?untilDate:DateTime) =
 
             let lookupLimitLocatorToUse =
                 sprintf "lookupLimit:%i," lookupLimitLocator
+
+            let sinceDateLocator =
+                if sinceDate.IsSome then
+                    sprintf "sinceDate:%s-0000," (sinceDate.Value.ToString("yyyyMMddTHHmmss"))
+                else
+                    ""
+
+            let untilDateLocator =
+                if untilDate.IsSome then
+                    sprintf "untilDate:%s-0000," (untilDate.Value.ToString("yyyyMMddTHHmmss"))
+                else
+                    ""
 
             let deepLimitLocator =
                 if lookupLimitLocator > 100 then
@@ -1648,68 +1369,75 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 else
                     ""
 
-            let builds = System.Collections.Generic.List<TcBuild>()
-            try
-                let getBranchLocator() = 
-                    if branch = "" then
-                        ""
-                    else
-                        ",branch:" + branch
+            let branchLocator = 
+                if branch = "" then
+                    ""
+                else
+                    ",branch:" + branch
 
-                let buildurl = "/app/rest/builds/" + "?locator=" + lookupLimitLocatorToUse + "buildType:" + buildConf + getBranchLocator() + deepLimitLocator + "&fields=build(id,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,artifacts,changes,branchName,comment,agent,buildType,properties)"
-                let contentString = httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content
-                let dataToUse = BuildResponse.Parse(contentString)
+            let buildurl = "/app/rest/builds/?locator=" + lookupLimitLocatorToUse + sinceDateLocator + untilDateLocator + "buildType:" + buildConf + branchLocator + deepLimitLocator
 
-                for fullBuildData in dataToUse.Build do
-                    let newBuild = new TcBuild()
-                    newBuild.Href <- fullBuildData.Href
-                    newBuild.BuildTypeId <- buildConf
-                    newBuild.Id <- fullBuildData.Id.ToString()
-                    newBuild.Number <- fullBuildData.Number.String.Value
-                    newBuild.State <- fullBuildData.State
-                    newBuild.Status <- fullBuildData.Status
-                    newBuild.WebUrl <- fullBuildData.WebUrl
-                    newBuild.StatusText <- if fullBuildData.StatusText.IsSome then fullBuildData.StatusText.Value else ""
-                    newBuild.Branch <- branch
-                    newBuild.BuildConfigurationId <- buildConf
-                    newBuild.BuildConfigurationName <- fullBuildData.BuildType.Value.Name
-                    if fullBuildData.QueuedDate.IsSome then
-                        newBuild.QueuedTime <- ParseDate(fullBuildData.QueuedDate.Value)
-                    if fullBuildData.StartDate.IsSome then
-                        newBuild.StartTime <- ParseDate(fullBuildData.StartDate.Value)
-                    if fullBuildData.FinishDate.IsSome then
-                        newBuild.EndTime <- ParseDate(fullBuildData.FinishDate.Value)
-                    newBuild.Comment <- if fullBuildData.Comment.IsSome then fullBuildData.Comment.Value.Text else ""
-                    if fullBuildData.Agent.IsSome then
-                        newBuild.AgentId <- string fullBuildData.Agent.Value.TypeId
-                        newBuild.AgentName <- fullBuildData.Agent.Value.Name
+            GetAdditionBuildInformationforBuildTypes(buildurl, conf, branch, getTests, getProps, getResultingProps, getArtifacts, getProblems, "")
+        
+        member this.GetBuildInfoFromBuildConfiguration(conf:ITeamcityConfiguration,
+            buildConf:string,
+            branch:string) =
+            (this :> ITeamcityConnector).GetBuildInfoFromBuildConfiguration(conf, buildConf, branch, "", 100)
+        
+        member this.GetBuildInfoFromBuildConfiguration(conf:ITeamcityConfiguration,
+            buildConf:string,
+            branch:string,
+            regxForResultProps:string,
+            lookupLimitLocator:int) =
 
-                    if getdetailedChangeLog then
-                        let mutable changeLog = ""
-                        let replyChangeData = Changes.Parse(httpconnector.HttpRequest(conf, fullBuildData.Changes.Value.Href, RestSharp.Method.Get).Content)
-                        try
-                            if replyChangeData.Count > 0 then
-                                for change in replyChangeData.Change do
-                                    let replyChangeDataUnique = ChangeUnique.Parse(httpconnector.HttpRequest(conf, change.Href, RestSharp.Method.Get).Content)
-                                    let changedata = Change()
-                                    changedata.Date <- replyChangeDataUnique.Date
-                                    changedata.Href <- replyChangeDataUnique.Href
-                                    changedata.Id <- sprintf "%i" replyChangeDataUnique.Id
-                                    changedata.UserName <- replyChangeDataUnique.Username
-                                    changedata.Version <- replyChangeDataUnique.Version
-                                    changedata.WebUrl <- replyChangeDataUnique.WebUrl
-                                    changedata.Comment <- replyChangeDataUnique.Comment
-                                    changedata.Version <- replyChangeDataUnique.Version
-                                    newBuild.ChangesData.Add(changedata)
-                                    changeLog <- changeLog + replyChangeDataUnique.Username + " : " + replyChangeDataUnique.Comment + "\r\n"
-                        with ex -> ()
-                        newBuild.Changes <- changeLog
-                    builds.Add(newBuild)
-            with
-            | ex -> ()
+            let count =
+                if lookupLimitLocator > 100 then
+                    lookupLimitLocator
+                else
+                    100
 
-            builds
+            let buildurl =
+                if branch = "master" || branch = "" then
+                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,default:true),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i" buildConf count lookupLimitLocator
+                else
+                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i" branch buildConf count lookupLimitLocator
 
+            GetAdditionBuildInformationforBuildTypes(buildurl, conf, branch, false, false, false, false, false, regxForResultProps)
+
+        member this.GetBuildInfoFromBuildConfiguration(conf:ITeamcityConfiguration,
+            buildConf:string,
+            branch:string,
+            regxForResultProps:string,
+            lookupLimitLocator:int,            
+            ?sinceDate:DateTime,
+            ?untilDate:DateTime) =
+
+            let count =
+                if lookupLimitLocator > 100 then
+                    lookupLimitLocator
+                else
+                    100
+
+            let sinceDateLocator =
+                if sinceDate.IsSome then
+                    sprintf "sinceDate:%s-0000," (sinceDate.Value.ToString("yyyyMMddTHHmmss"))
+                else
+                    ""
+
+            let untilDateLocator =
+                if untilDate.IsSome then
+                    sprintf "untilDate:%s-0000," (untilDate.Value.ToString("yyyyMMddTHHmmss"))
+                else
+                    ""
+
+            let buildurl =
+                if branch = "master" || branch = "" then
+                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,default:true),state:(finished:true),buildType:(id:%s),start:0,count:%i,%s%slookupLimit:%i" buildConf count sinceDateLocator untilDateLocator lookupLimitLocator
+                else
+                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),state:(finished:true),buildType:(id:%s),start:0,count:%i,%s%slookupLimit:%i" branch buildConf count sinceDateLocator untilDateLocator lookupLimitLocator
+
+            GetAdditionBuildInformationforBuildTypes(buildurl, conf, branch, false, false, false, false, false, regxForResultProps)
+            
         member this.GetCanceledBuilds(conf:ITeamcityConfiguration,
                                                     buildConf:string,
                                                     branch:string) =
@@ -1748,58 +1476,6 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         builds.Add(newBuild)
             with
             | ex -> ()
-            builds
-
-        member this.GetBuildInfoFromBuildCondiguration(conf:ITeamcityConfiguration,
-                                                    buildConf:string,
-                                                    branch:string,
-                                                    lookupLimitLocator:int) =
-            let count =
-                if lookupLimitLocator > 100 then
-                    lookupLimitLocator
-                else
-                    100
-
-            let builds = System.Collections.Generic.List<TcBuild>()
-
-            let uiWebRequest =
-                if branch = "master" || branch = "" then
-                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,default:true),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,project,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType,comment)" buildConf count lookupLimitLocator
-                else
-                    sprintf "/app/rest/builds/?locator=defaultFilter:false,branch:(policy:ALL_BRANCHES,name:(matchType:equals,value:(%s))),state:(finished:true),buildType:(id:%s),start:0,count:%i,lookupLimit:%i&fields=build(id,project,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,buildType,comment)" branch buildConf count lookupLimitLocator
-
-            let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, uiWebRequest, RestSharp.Method.Get).Content)
-
-            for build in data.Build do
-                try
-                    let newBuild = new TcBuild()
-                    newBuild.Href <- build.Href
-                    newBuild.BuildTypeId <- build.BuildTypeId
-                    newBuild.Id <- build.Id.ToString()
-                    newBuild.Number <- build.Number.String.Value
-                    newBuild.State <- build.State
-                    newBuild.Status <- build.Status
-                    if build.StatusText.IsSome then
-                        newBuild.StatusText <- build.StatusText.Value
-                    newBuild.WebUrl <- build.WebUrl
-                    newBuild.Branch <- branch
-                    newBuild.ProjectId <-  build.BuildType.Value.ProjectId
-                    if build.QueuedDate.IsSome then
-                        newBuild.QueuedTime <- ParseDate(build.QueuedDate.Value)
-
-                    if build.StartDate.IsSome then
-                        newBuild.StartTime <- ParseDate(build.StartDate.Value)
-
-                    if build.FinishDate.IsSome then
-                        newBuild.EndTime <- ParseDate(build.FinishDate.Value)
-
-                    if build.Comment.IsSome then
-                        newBuild.Comment <- try build.Comment.Value.Text with | _ -> ""
-
-                    builds.Add(newBuild)
-                with
-                | ex -> ()
-
             builds
 
         member this.GetLastRunningBuildForConfig(builds : System.Collections.Generic.List<TcBuild>, platform : string, config : string) = 

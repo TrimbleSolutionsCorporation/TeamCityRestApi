@@ -36,6 +36,11 @@ namespace TeamcityRestTypes
         }
 
         /// <summary>
+        /// Gets or sets the revision id for the commit.
+        /// </summary>
+        public string Revision { get; set; }
+
+        /// <summary>
         /// Gets or sets the build type id.
         /// </summary>
         /// <value>
@@ -335,12 +340,12 @@ namespace TeamcityRestTypes
         /// </summary>
         private string DebuggerDisplay => $"{Number} : {BuildConfigurationName} : {Status} => {StatusText}";
 
-		/// <summary>
-		/// Gets or sets the ProjectId.
-		/// </summary>
-		/// <value>
-		/// The Project Id.
-		/// </value>
-		public string ProjectId { get; set; }
-	}
+        /// <summary>
+        /// Gets or sets the ProjectId.
+        /// </summary>
+        /// <value>
+        /// The Project Id.
+        /// </value>
+        public string ProjectId { get; set; }
+    }
 }
