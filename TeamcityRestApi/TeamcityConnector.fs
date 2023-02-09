@@ -349,9 +349,9 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
 
         let fieldsToGet =
             if getProps then
-                sprintf "&fields=build(id,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,artifacts,changes(change(comment,version,username,date,href,webUrl)),branchName,comment,agent,buildType,properties(property)%s)" regxForResultingProps
+                sprintf "&fields=build(id,revisions,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,artifacts,changes(change(comment,version,username,date,href,webUrl)),branchName,comment,agent,buildType,properties(property)%s)" regxForResultingProps
             else
-                sprintf "&fields=build(id,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,artifacts,changes(change(comment,version,username,date,href,webUrl)),branchName,comment,agent,buildType%s)" regxForResultingProps
+                sprintf "&fields=build(id,revisions,startDate,finishDate,queuedDate,statusText,status,href,state,webUrl,number,artifacts,changes(change(comment,version,username,date,href,webUrl)),branchName,comment,agent,buildType%s)" regxForResultingProps
 
         let buildurl = baseApi + fieldsToGet
         let data = BuildResponse.Parse(httpconnector.HttpRequest(conf, buildurl, RestSharp.Method.Get).Content)
@@ -376,7 +376,12 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             newBuild.StatusText <- if build.StatusText.IsSome then build.StatusText.Value else ""
             newBuild.Branch <- branch
 
-            
+            newBuild.Revision <-
+                if build.Revisions.IsSome && build.Revisions.Value.Count > 0  then
+                    build.Revisions.Value.Revision.[0].Version
+                else
+                    null
+                    
             newBuild.BuildConfigurationName <- build.BuildType.Value.Name
             if build.QueuedDate.IsSome then
                 newBuild.QueuedTime <- ParseDate(build.QueuedDate.Value)
@@ -1083,6 +1088,12 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             newBuild.StartTime <- ParseDate(fullBuildData.StartDate)
             newBuild.EndTime <- ParseDate(fullBuildData.FinishDate)
             newBuild.Comment <- if contentString.Contains("comment") then try fullBuildData.Comment.Text with | _ -> "" else ""
+            newBuild.Revision <-
+                if fullBuildData.Revisions.Count > 0 then
+                    fullBuildData.Revisions.Revision.[0].Version
+                else
+                    null
+
             if contentString.Contains("\"agent\":") then
                 if fullBuildData.Agent.JsonValue.ToString().Contains("\"typeId\":") then
                     newBuild.AgentId <- string fullBuildData.Agent.TypeId

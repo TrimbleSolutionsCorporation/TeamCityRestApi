@@ -535,6 +535,16 @@ type BuildResponse = JsonProvider<"""
     "typeId": 219,
     "href": "/app/rest/agents/id:219"
 },
+"revisions": {
+    "count": 1,
+    "revision": [
+        {
+            "version": "67c28a50b437af03d9d006c5248680beb4545751",
+            "vcsBranchName": "refs/heads/master",
+            "vcs-root-instance": {}
+        }
+    ]
+},
 "artifacts": {
     "href": "/app/rest/builds/id:35553629/artifacts/children/"
 },
