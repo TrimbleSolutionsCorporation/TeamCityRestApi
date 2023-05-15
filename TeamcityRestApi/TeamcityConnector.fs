@@ -595,7 +595,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                         newConfig.WebUrl <- buildType.WebUrl
                         newConfig.Href <- buildType.Href
                         let datax = BuildTypeResponse.Parse(httpconnector.HttpRequest(conf, newConfig.Href, RestSharp.Method.Get).Content)
-                        newConfig.BuildIdRef <- datax.Builds.Href
+                        try newConfig.BuildIdRef <- datax.Builds.Href with | ex -> ()
                         outProject.BuildConfigurationTypes.Add(newConfig)
 
                 if data.Projects.Count > 0 then
