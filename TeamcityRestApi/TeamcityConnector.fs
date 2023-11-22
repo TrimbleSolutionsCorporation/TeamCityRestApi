@@ -89,6 +89,8 @@ type ITeamcityConnector =
   abstract member UnMuteTest : ConnectionConfiguration:ITeamcityConfiguration * muteId:string -> string
   abstract member GetAgents : ConnectionConfiguration:ITeamcityConfiguration * bool -> System.Collections.Generic.List<TcAgent>
   abstract member GetAgents : ConnectionConfiguration:ITeamcityConfiguration * bool * bool * bool -> System.Collections.Generic.List<TcAgent>
+  abstract member GetUnAuthorizedAgents : ConnectionConfiguration:ITeamcityConfiguration -> System.Collections.Generic.List<TcAgent>
+  
   abstract member GetAllAgents : ConnectionConfiguration:ITeamcityConfiguration * bool -> System.Collections.Generic.List<TcAgent>
   abstract member DisableAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string -> bool
   abstract member DisableAgent : ConnectionConfiguration:ITeamcityConfiguration * id:string * reason:string -> bool
@@ -227,6 +229,71 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         | ex -> 
             ()
         newqueue
+    
+    let GetAgentsInfo(reply:string, details:bool, conf:ITeamcityConfiguration) =       
+        let dataParsed = AgentsResponse.Parse(reply)
+        let agents = new System.Collections.Generic.List<TcAgent>()
+        for agent in dataParsed.Agent do
+            let agentNew = TcAgent()
+            agentNew.Name <- agent.Name
+            agentNew.Id <- agent.Id
+            agentNew.Ip <- agent.Ip.Value
+            agentNew.WebUrl <- agent.WebUrl
+            if agent.Enabled.IsSome then
+                agentNew.Enabled <- agent.Enabled.Value
+            if agent.Authorized.IsSome then
+                agentNew.Authorized <- agent.Authorized.Value
+            if agent.Connected.IsSome then
+                agentNew.Connected <- agent.Connected.Value
+
+            agentNew.Href <- agent.Href
+            let pool = TcAgentPool()
+            pool.Id <- agent.Pool.Value.Id
+            pool.Href <- agent.Pool.Value.Href
+            pool.Name  <- agent.Pool.Value.Name
+            agentNew.AgentPool <- pool
+            if details then
+                let replyDetails = httpconnector.HttpRequest(conf, agent.Href, RestSharp.Method.Get).Content
+                let dataParsedDetails = AgentDetails.Parse(replyDetails)
+                let authorizedInfoData = dataParsedDetails.AuthorizedInfo.JsonValue.ToString()
+                let authorizedStatusInfo = new StatusInfo()
+                authorizedStatusInfo.Status <- dataParsedDetails.AuthorizedInfo.Status
+                if authorizedInfoData.Contains("comment") then
+                    let tcComment = new TcComment()                        
+                    if authorizedInfoData.Contains("user") then
+                        tcComment.User <- dataParsedDetails.AuthorizedInfo.Comment.User.Name
+                        tcComment.UserName <- dataParsedDetails.AuthorizedInfo.Comment.User.Username
+                    if authorizedInfoData.Contains("text") then
+                        tcComment.Text <- dataParsedDetails.AuthorizedInfo.Comment.Text
+                    if authorizedInfoData.Contains("timestamp") then
+                        tcComment.TimeStamp <- try DateTime.ParseExact(dataParsedDetails.AuthorizedInfo.Comment.Timestamp.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture) with | _ -> DateTime.Now
+                    authorizedStatusInfo.Comment <- tcComment
+                agentNew.AuthorizedInfo <- authorizedStatusInfo
+
+                let enabledInfoData = dataParsedDetails.EnabledInfo.JsonValue.ToString()
+                let enabledStatusInfo = new StatusInfo()
+                enabledStatusInfo.Status <- dataParsedDetails.EnabledInfo.Status
+                if enabledInfoData.Contains("comment") then
+                    let tcComment = new TcComment()   
+                    if enabledInfoData.Contains("user") then
+                        tcComment.User <- dataParsedDetails.EnabledInfo.Comment.User.Name
+                        tcComment.UserName <- dataParsedDetails.EnabledInfo.Comment.User.Username
+                    if enabledInfoData.Contains("text") then
+                        tcComment.Text <- dataParsedDetails.EnabledInfo.Comment.Text
+                    if enabledInfoData.Contains("timestamp") then
+                        tcComment.TimeStamp <- try DateTime.ParseExact(dataParsedDetails.EnabledInfo.Comment.Timestamp.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture) with | _ -> DateTime.Now
+                    enabledStatusInfo.Comment <- tcComment
+                agentNew.EnabledInfo <- enabledStatusInfo
+
+
+                for prop in dataParsedDetails.Properties.Property do
+                    if prop.Value.String.IsSome then
+                        agentNew.Properties.Add(prop.Name, prop.Value.String.Value)
+                    else
+                        agentNew.Properties.Add(prop.Name, "")
+
+            agents.Add(agentNew)
+        agents
 
     let GetTest(test:TcTest, conf:ITeamcityConfiguration) =
         let buildfortestdetails = test.Href
@@ -744,92 +811,20 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 agents.Add(agentNew)
             agents
 
+        member this.GetUnAuthorizedAgents(conf:ITeamcityConfiguration) = 
+            let url = "/app/rest/agents?locator=authorized:false&fields=agent(id,name,typeId,href,webUrl,pool,ip,connected,enabled,authorized,authorizedInfo,enabledInfo,connectedInfo)"
+            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
+            GetAgentsInfo(reply, true, conf)
+
         member this.GetAgents(conf:ITeamcityConfiguration, details:bool) =
             (this :> ITeamcityConnector).GetAgents(conf, details, true, true)
 
         member this.GetAgents(conf:ITeamcityConfiguration, details:bool, enabledOnly:bool, connectedOnly:bool) =
-            let mutable locator = ""
-            if enabledOnly then
-                locator <- "enabled:true"
-
-            if connectedOnly then
-                if locator <> "" then
-                    locator <- ",connected:true"
-                else
-                    locator <- "connected:true"
-            
-            if locator.Equals(",connected:true") then
-                locator <- "connected:true"
-
-            if locator <> "" then
-                locator <- "locator=" + locator + "&"
+            let locator = sprintf "enabled:%b,connected:%b" enabledOnly connectedOnly
                     
-            let url = "/app/rest/agents?" + locator + "fields=agent(id,name,typeId,href,webUrl,pool,ip,connected,enabled,authorized,authorizedInfo,enabledInfo,connectedInfo)"
-
+            let url = "/app/rest/agents?" + locator + "&fields=agent(id,name,typeId,href,webUrl,pool,ip,connected,enabled,authorized,authorizedInfo,enabledInfo,connectedInfo)"                        
             let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
-            let dataParsed = AgentsResponse.Parse(reply)
-            let agents = new System.Collections.Generic.List<TcAgent>()
-            for agent in dataParsed.Agent do
-                let agentNew = TcAgent()
-                agentNew.Name <- agent.Name
-                agentNew.Id <- agent.Id
-                agentNew.Ip <- agent.Ip.Value
-                agentNew.WebUrl <- agent.WebUrl
-                if agent.Enabled.IsSome then
-                    agentNew.Enabled <- agent.Enabled.Value
-                if agent.Authorized.IsSome then
-                    agentNew.Authorized <- agent.Authorized.Value
-                if agent.Connected.IsSome then
-                    agentNew.Connected <- agent.Connected.Value
-
-                agentNew.Href <- agent.Href
-                let pool = TcAgentPool()
-                pool.Id <- agent.Pool.Value.Id
-                pool.Href <- agent.Pool.Value.Href
-                pool.Name  <- agent.Pool.Value.Name
-                agentNew.AgentPool <- pool
-                if details then
-                    let replyDetails = httpconnector.HttpRequest(conf, agent.Href, RestSharp.Method.Get).Content
-                    let dataParsedDetails = AgentDetails.Parse(replyDetails)
-                    let authorizedInfoData = dataParsedDetails.AuthorizedInfo.JsonValue.ToString()
-                    let authorizedStatusInfo = new StatusInfo()
-                    authorizedStatusInfo.Status <- dataParsedDetails.AuthorizedInfo.Status
-                    if authorizedInfoData.Contains("comment") then
-                        let tcComment = new TcComment()                        
-                        if authorizedInfoData.Contains("user") then
-                            tcComment.User <- dataParsedDetails.AuthorizedInfo.Comment.User.Name
-                            tcComment.UserName <- dataParsedDetails.AuthorizedInfo.Comment.User.Username
-                        if authorizedInfoData.Contains("text") then
-                            tcComment.Text <- dataParsedDetails.AuthorizedInfo.Comment.Text
-                        if authorizedInfoData.Contains("timestamp") then
-                            tcComment.TimeStamp <- try DateTime.ParseExact(dataParsedDetails.AuthorizedInfo.Comment.Timestamp.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture) with | _ -> DateTime.Now
-                        authorizedStatusInfo.Comment <- tcComment
-                    agentNew.AuthorizedInfo <- authorizedStatusInfo
-
-                    let enabledInfoData = dataParsedDetails.EnabledInfo.JsonValue.ToString()
-                    let enabledStatusInfo = new StatusInfo()
-                    enabledStatusInfo.Status <- dataParsedDetails.EnabledInfo.Status
-                    if enabledInfoData.Contains("comment") then
-                        let tcComment = new TcComment()   
-                        if enabledInfoData.Contains("user") then
-                            tcComment.User <- dataParsedDetails.EnabledInfo.Comment.User.Name
-                            tcComment.UserName <- dataParsedDetails.EnabledInfo.Comment.User.Username
-                        if enabledInfoData.Contains("text") then
-                            tcComment.Text <- dataParsedDetails.EnabledInfo.Comment.Text
-                        if enabledInfoData.Contains("timestamp") then
-                            tcComment.TimeStamp <- try DateTime.ParseExact(dataParsedDetails.EnabledInfo.Comment.Timestamp.Split('+').[0], "yyyyMMddTHHmmss", CultureInfo.InvariantCulture) with | _ -> DateTime.Now
-                        enabledStatusInfo.Comment <- tcComment
-                    agentNew.EnabledInfo <- enabledStatusInfo
-
-
-                    for prop in dataParsedDetails.Properties.Property do
-                        if prop.Value.String.IsSome then
-                            agentNew.Properties.Add(prop.Name, prop.Value.String.Value)
-                        else
-                            agentNew.Properties.Add(prop.Name, "")
-
-                agents.Add(agentNew)
-            agents
+            GetAgentsInfo(reply, details, conf)
 
         member this.MuteTest(conf:ITeamcityConfiguration, scopeId:string, reasonTxt:string, resolution:MuteResolution, testName:string) = 
             let payload = getMutePayload(conf.Username, reasonTxt, testName, resolution, scopeId)
@@ -1217,7 +1212,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 else
                     ""
 
-            let buildurlFirst = sprintf "/app/rest/buildTypes?locator=build:(buildType:%s)&fields=buildType(id,name,builds($locator(%scount:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment)))" buildTypeId branchToUse
+            let buildurlFirst = sprintf "/app/rest/buildTypes?locator=id:%s&fields=buildType(id,name,builds($locator(%scount:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment)))" buildTypeId branchToUse
             let dataS = httpconnector.HttpRequest(conf, buildurlFirst, RestSharp.Method.Get)
             let dataAnswer = dataS.Content
             let builds = System.Collections.Generic.List<TcBuild>()
