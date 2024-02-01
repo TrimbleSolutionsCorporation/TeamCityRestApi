@@ -8,6 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 
 namespace TeamcityRestTypes
 {
@@ -31,8 +32,18 @@ namespace TeamcityRestTypes
         public string Href { get; set; }
 
         /// <summary>
+        /// gets set mute
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
         /// Timestamp
         /// </summary>
         public DateTime TimeStamp { get; set; }
+
+        /// <summary>
+        /// tests
+        /// </summary>
+        public List<TcTest> Tests { get; } = new List<TcTest>();
     }
 }

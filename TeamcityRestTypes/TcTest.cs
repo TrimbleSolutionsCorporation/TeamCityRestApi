@@ -96,5 +96,9 @@ namespace TeamcityRestTypes
         /// first build that failure occured
         /// </summary>
         public TcTest FirstFailure { get; set; }
+
+        public int PassedCnt { get; set; }
+        public int MutedCnt { get; set; }
+        public int FailingCnt { get; set; }
     }
 }

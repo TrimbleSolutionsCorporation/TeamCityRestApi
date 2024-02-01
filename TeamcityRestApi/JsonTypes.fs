@@ -1038,6 +1038,7 @@ type QueuedBuildResponse = JsonProvider<"""
 }
 """>
 
+
 type TriggerBuildResponse = XmlProvider<""" 
 <build id="9592904"
        buildTypeId="StructuresOfficial_MakeReleaseTest_MakeReleaseReset" state="queued" branchName="master" href="/app/rest/buildQueue/id:9592904" webUrl="http://teamcity/viewQueued.html?itemId=9592904">
@@ -1071,6 +1072,90 @@ type TriggerBuildResponse = XmlProvider<"""
 </attributes>
 </build> """>
 
+type MuteResponse = JsonProvider<"""
+{
+  "count": 1000,
+  "nextHref": "/app/rest/mutes?locator=affectedProject:TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster,count:1000,resolution:whenFixed,start:1000",
+  "href": "/app/rest/mutes?locator=affectedProject:TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster,resolution:whenFixed,count:1000",
+  "mute": [
+    {
+      "id": 6142,
+      "href": "/app/rest/mutes/id:6142",
+      "assignment": {
+        "timestamp": "20181001T092437+0300",
+        "text": "TTSD-19665"
+      },
+      "scope": {
+        "project": {
+          "id": "TeklaStructuresIntegrationTests_Farmi",
+          "name": "Taf",
+          "parentProjectId": "TeklaStructuresBuilds",
+          "href": "/app/rest/projects/id:TeklaStructuresIntegrationTests_Farmi",
+          "webUrl": "https://teamcity.tekla.com/project.html?projectId=TeklaStructuresIntegrationTests_Farmi"
+        }
+      },
+      "target": {
+        "problems": {
+          "count": 1,
+          "problem": [
+            {
+              "id": "160275",
+              "type": "TC_SERVICE_MESSAGE",
+              "identity": "-1472848813",
+              "href": "/app/rest/problems/id:160275"
+            }
+          ]
+        }
+      },
+      "resolution": {
+        "type": "whenFixed"
+      }
+    },
+    {
+      "id": 6236,
+      "href": "/app/rest/mutes/id:6236",
+      "assignment": {
+        "timestamp": "20181109T133707+0200",
+        "text": "TTT-3552"
+      },
+      "scope": {
+        "project": {
+          "id": "TeklaStructuresIntegrationTests_Farmi",
+          "name": "Taf",
+          "parentProjectId": "TeklaStructuresBuilds",
+          "href": "/app/rest/projects/id:TeklaStructuresIntegrationTests_Farmi",
+          "webUrl": "https://teamcity.tekla.com/project.html?projectId=TeklaStructuresIntegrationTests_Farmi"
+        }
+      },
+      "target": {
+        "tests": {
+          "count": 3,
+          "test": [
+            {
+              "id": "-857460802966200899",
+              "name": "SetUp_failed_for_test_fixture_TSDIntegrator.NunitTest.TSDExportSteelBeamTest",
+              "href": "/app/rest/tests/id:-857460802966200899"
+            },
+            {
+              "id": "6814200527226482150",
+              "name": "SetUp_failed_for_test_fixture_TSDIntegrator.NunitTest.TSDAttributesTest",
+              "href": "/app/rest/tests/id:6814200527226482150"
+            },
+            {
+              "id": "7898640663436131300",
+              "name": "SetUp_failed_for_test_fixture_TSDIntegrator.NunitTest.TSDExportMemberReleasesTest",
+              "href": "/app/rest/tests/id:7898640663436131300"
+            }
+          ]
+        }
+      },
+      "resolution": {
+        "type": "whenFixed"
+      }
+    }
+  ]
+}
+""">
 
 type TestDetails = JsonProvider<"""
 {
@@ -1132,9 +1217,40 @@ type TestResponse = JsonProvider<"""
             "href": "/app/rest/testOccurrences/id:15509,build:(id:12632785)"
         }
     ],
-    "default": false
+    "default": false,
+    "passed": 2
 }
 """>
+
+type TestResponseWithCountOne = JsonProvider<"""
+{
+  "count": 1,
+  "href": "http://teamcity.tekla.com/app/rest/testOccurrences?locator=test:(id:-1645860079491460674),count:1",
+  "nextHref": "/app/rest/testOccurrences?locator=count:1,start:1,test:(id:-1645860079491460674)",
+  "testOccurrence": [
+    {
+      "id": "build:(id:42705844),id:2000000015",
+      "name": "Work-TAF: FTC_62.103_ClashCheck_DWG.ReferenceValidation",
+      "status": "SUCCESS",
+      "duration": 4473,
+      "muted": true,
+      "currentlyInvestigated": true,
+      "currentlyMuted": true,
+      "href": "/app/rest/testOccurrences/build:(id:42705844),id:2000000015"
+    },
+    {
+      "id": "build:(id:42671475),id:2000000015",
+      "name": "Work-TAF: FTC_62.103_ClashCheck_DWG.ReferenceValidation",
+      "status": "SUCCESS",
+      "href": "/app/rest/testOccurrences/build:(id:42671475),id:2000000015"
+    }
+  ],
+  "passed": 1,
+  "muted": 1,
+  "failing": 1
+}
+""">
+
 
 type UniqueBuildResponse = JsonProvider<"""
 {

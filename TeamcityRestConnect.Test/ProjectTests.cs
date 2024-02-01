@@ -8,7 +8,8 @@ namespace TeamcityRestConnect.Test
     using TeamcityRestTypes;
     using System.Collections.Generic;
     using System;
-    
+    using System.IO;
+
     [TestFixture]
     public class ProjectTests
     {
@@ -108,6 +109,156 @@ namespace TeamcityRestConnect.Test
                 }
             }
         }
+
+        // [Test]
+        public void CleanMutes()
+        {
+            var configuration = new Configuration();
+            configuration.Hostname = "";
+            configuration.Username = "";
+            configuration.Password = "";
+            configuration.Token = "";
+            ITeamcityConnector restClient = new TeamcityConnector(new JsonTeamcityConnector());
+
+            var allManualMutes = restClient.GetAllMutesInAffectedProject(configuration, "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster", MuteResolution.Manual);
+
+            if (File.Exists(@"e:\oldmanualmutes.txt"))
+                File.Delete(@"e:\oldmanualmutes.txt");
+            if (File.Exists(@"e:\recentmanualmutes.txt"))
+                File.Delete(@"e:\recentmanualmutes.txt");
+            if (File.Exists(@"e:\nobuildfoundformanualmute.txt"))
+                File.Delete(@"e:\nobuildfoundformanualmute.txt");
+
+            foreach (var mute in allManualMutes)
+            {
+                bool buildObserved = true;
+
+                var stringForTests = string.Empty;
+                foreach (var testOccurence in mute.Tests)
+                {
+                    stringForTests += testOccurence.Name + "," + testOccurence.Href;
+                    var lastObservation = restClient.GetLatestObservedTest(configuration, testOccurence.Id);
+                    if (lastObservation != null)
+                    {
+                        // get build id "id": "build:(id:16523339),id:1242",
+                        var buildId = lastObservation.Id.Split(',')[0].Split(':')[2].Trim(')');
+                        var tcBuild = restClient.GetBuildById(configuration, buildId);
+                        if (DateTime.Now - tcBuild.EndTime > TimeSpan.FromDays(365))
+                        {
+                            stringForTests += " - Has not run since: " + tcBuild.EndTime + " : " + tcBuild.WebUrl;
+                        }
+                        else
+                        {
+                            stringForTests += " - Last Run: " + tcBuild.EndTime + " : " + tcBuild.WebUrl;
+                        }
+                    }
+                    else
+                    {
+                        buildObserved = false;
+                    }
+                }
+
+                if (buildObserved)
+                {
+                    // write to file what will be unmuted, in e:\temp\unmute.txt
+                    if (stringForTests.Contains("Has not run since"))
+                    {
+                        AppendMuteToDeleteToFile(mute, stringForTests, @"e:\oldmanualmutes.txt");
+                        // restClient.UnMuteTest(configuration, mute);       
+                    }
+                    else
+                    {
+                        AppendMuteToDeleteToFile(mute, stringForTests, @"e:\recentmanualmutes.txt");
+                    }
+
+                    // restClient.UnMuteTest(configuration, mute);                    
+                }
+                else
+                {
+
+                    // write to file what will be kept muted, in e:\temp\keepmute.txt
+                    AppendMuteToDeleteToFile(mute, stringForTests, @"e:\nobuildfoundformanualmute.txt");
+                    // restClient.UnMuteTest(configuration, mute);       
+                }
+            }
+
+            if (File.Exists(@"e:\unmuteoutdate.txt"))
+                File.Delete(@"e:\unmuteoutdate.txt");
+
+            if (File.Exists(@"e:\unmute.txt"))
+                File.Delete(@"e:\unmute.txt");
+
+            if (File.Exists(@"e:\keepmute.txt"))
+                File.Delete(@"e:\keepmute.txt");
+
+
+
+            var allMutes = restClient.GetAllMutesInAffectedProject(configuration, "TeklaStructuresIntegrationTests_Farmi_FarmiOnMaster", MuteResolution.Automatic);
+
+            foreach (var mute in allMutes)
+            {
+                bool isStillFailing = false;
+
+                var stringForTests = string.Empty;
+                foreach (var testOccurence in mute.Tests)
+                {                    
+                    stringForTests += testOccurence.Name + "," + testOccurence.Href;
+                    var lastObservation = restClient.GetLatestObservedTest(configuration, testOccurence.Id);
+                    if (lastObservation != null)
+                    {
+                        if (lastObservation.MutedCnt > 0 || lastObservation.FailingCnt > 0)
+                        {
+                            // get build id "id": "build:(id:16523339),id:1242",
+                            var buildId = lastObservation.Id.Split(',')[0].Split(':')[2].Trim(')');
+                            var tcBuild = restClient.GetBuildById(configuration, buildId);
+                            if (DateTime.Now - tcBuild.EndTime > TimeSpan.FromDays(15))
+                            {
+                                stringForTests += " - Has not run since: " + tcBuild.EndTime + " : " + tcBuild.WebUrl;
+                            }
+                            else
+                            {
+                                stringForTests += " - Last Run: " + tcBuild.EndTime + " : " + tcBuild.WebUrl;
+                                isStillFailing = true;
+                            }
+                        }
+                    }
+                }
+
+                if (!isStillFailing)
+                {
+                    // write to file what will be unmuted, in e:\temp\unmute.txt
+                    if (stringForTests.Contains("Has not run since"))
+                    {
+                        AppendMuteToDeleteToFile(mute, stringForTests, @"e:\unmuteoutdate.txt");
+                    }
+                    else
+                    {
+                        AppendMuteToDeleteToFile(mute, stringForTests, @"e:\unmute.txt");
+                    }
+                    
+                    // restClient.UnMuteTest(configuration, mute);                    
+                }
+                else
+                {
+
+                    // write to file what will be kept muted, in e:\temp\keepmute.txt
+                    AppendMuteToDeleteToFile(mute, stringForTests, @"e:\keepmute.txt");
+                }
+            }
+        }
+
+        private void AppendMuteToDeleteToFile(MuteDetails mute, string data, string filePath)
+        {
+            var stringToWriteToFile = mute.Href + ", " + data;
+
+
+            // Append the string to the specified file
+            using (StreamWriter writer = File.AppendText(filePath))
+            {
+                writer.WriteLine(stringToWriteToFile);
+            }
+        }
+
 
 
         //[Test]

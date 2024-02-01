@@ -41,6 +41,8 @@ type ITeamcityConnector =
   abstract member GetTestsForBuild : ConnectionConfiguration:ITeamcityConfiguration * build:TcBuild -> unit
 
   abstract member GetTest : conf:ITeamcityConfiguration * testId:string -> TcTest
+  abstract member GetLatestObservedTest : conf:ITeamcityConfiguration * testId:string -> TcTest
+  
   
   abstract member GetCanceledBuilds : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string -> System.Collections.Generic.List<TcBuild>
 
@@ -53,7 +55,7 @@ type ITeamcityConnector =
   abstract member GetBuildInfoFromBuildConfiguration : conf:ITeamcityConfiguration * buildConf:string * branch:string * regxForResultProps:string * lookupLimitLocator:int * ?fromDate:DateTime * ?untilDate:DateTime -> System.Collections.Generic.List<TcBuild>
   
   abstract member GetFailedBuildsFromProject : ConnectionConfiguration:ITeamcityConfiguration * ProjectName:string * branch:string -> System.Collections.Generic.List<TcBuild>
-  abstract member GetLastBuildsFromProject : ConnectionConfiguration:ITeamcityConfiguration * ProjectName:string * branch:string -> System.Collections.Generic.List<TcBuild>
+  abstract member GetLastBuildsFromProject : ConnectionConfiguration:ITeamcityConfiguration * ProjectName:string * branch:string * isDefault:bool -> System.Collections.Generic.List<TcBuild>
   abstract member GetLastBuildFromBuildConfiguration : ConnectionConfiguration:ITeamcityConfiguration * ProjectName:string * branch:string -> System.Collections.Generic.List<TcBuild>
   
   abstract member GetFailedBuildsFromConfiguration : ConnectionConfiguration:ITeamcityConfiguration * buildConf:string * branch:string -> System.Collections.Generic.List<TcBuild>
@@ -85,6 +87,7 @@ type ITeamcityConnector =
   abstract member CancelBuild : ConnectionConfiguration:ITeamcityConfiguration * buildUrl:string * readInToQueue:bool * cancelingComment:string * cancelingApplication:string -> bool
   abstract member MoveBuildToTop : ConnectionConfiguration:ITeamcityConfiguration * buildid:string -> bool
   
+  abstract member GetAllMutesInAffectedProject : ConnectionConfiguration:ITeamcityConfiguration * affectedProject:string * resolutionType:MuteResolution -> System.Collections.Generic.List<MuteDetails>
   abstract member MuteTest : ConnectionConfiguration:ITeamcityConfiguration * scopeId:string * reason:string * resolutionType:MuteResolution * testName:string -> bool
   abstract member UnMuteTest : ConnectionConfiguration:ITeamcityConfiguration * muteId:string -> string
   abstract member GetAgents : ConnectionConfiguration:ITeamcityConfiguration * bool -> System.Collections.Generic.List<TcAgent>
@@ -230,6 +233,33 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             ()
         newqueue
     
+    let getMuteInfo(reply:string) =       
+        let dataParsed = MuteResponse.Parse(reply)
+        let mutes = new System.Collections.Generic.List<MuteDetails>()
+        for mute in dataParsed.Mute do
+            let muteToSave = MuteDetails()
+            muteToSave.Id <- mute.Id.ToString()
+            muteToSave.Href <- mute.Href
+            mutes.Add(muteToSave)
+
+            if mute.Target.Tests.IsSome then
+                for test in mute.Target.Tests.Value.Test do
+                    let testToSave = TcTest()
+                    testToSave.Name <- test.Name
+                    testToSave.Id <- test.Id.ToString()
+                    testToSave.Href <- test.Href
+                    muteToSave.Tests.Add(testToSave)
+
+            if mute.Target.Problems.IsSome then
+                for test in mute.Target.Problems.Value.Problem do
+                    let testToSave = TcTest()
+                    testToSave.Name <- test.Type
+                    testToSave.Id <- test.Id.ToString()
+                    testToSave.Href <- test.Href
+                    muteToSave.Tests.Add(testToSave)
+        mutes
+
+
     let GetAgentsInfo(reply:string, details:bool, conf:ITeamcityConfiguration) =       
         let dataParsed = AgentsResponse.Parse(reply)
         let agents = new System.Collections.Generic.List<TcAgent>()
@@ -706,6 +736,30 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             rootProject
 
     interface ITeamcityConnector with
+
+        member this.GetLatestObservedTest(conf:ITeamcityConfiguration, testId:string) =
+            let buildurltests = sprintf "/app/rest/testOccurrences?locator=test:(id:%s),count:1" testId
+            let testResponse = TestResponseWithCountOne.Parse(httpconnector.HttpRequest(conf, buildurltests, RestSharp.Method.Get).Content)
+            try
+                if testResponse.Count > 0 then
+                    let test = testResponse.TestOccurrence.[0]
+                    let newTest = new TcTest()
+                    newTest.Id <- test.Id
+                    newTest.Name <- test.Name
+                    newTest.Duration <- if test.Duration.IsSome then test.Duration.Value else 0
+                    newTest.CurrentlyInvestigated <- if test.CurrentlyInvestigated.IsSome then test.CurrentlyInvestigated.Value else false
+                    newTest.CurrentlyMuted <- if test.CurrentlyMuted.IsSome then test.CurrentlyMuted.Value else false
+                    newTest.Muted <- if test.Muted.IsSome then test.Muted.Value else newTest.CurrentlyMuted
+                    newTest.Status <- test.Status
+                    newTest.Href <- test.Href
+                    newTest.PassedCnt <- try testResponse.Passed with | ex -> 0
+                    newTest.MutedCnt <- try testResponse.Muted with | ex -> 0
+                    newTest.FailingCnt <- try testResponse.Failing with | ex -> 0
+                    newTest
+                else
+                    null
+            with | ex -> null
+
         member this.GetTestDetails(test:TcTest, conf:ITeamcityConfiguration) = 
             GetTest(test, conf)
 
@@ -830,6 +884,17 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             let payload = getMutePayload(conf.Username, reasonTxt, testName, resolution, scopeId)
             let url = "/app/rest/mutes"
             httpconnector.HttpPostRequestContent(conf, url, payload).StatusCode = HttpStatusCode.OK
+
+        member this.GetAllMutesInAffectedProject(conf:ITeamcityConfiguration, affectedProject:string, resolution:MuteResolution) = 
+            let resType =
+                match resolution with
+                | MuteResolution.Manual -> "manually"
+                | MuteResolution.Automatic -> "whenFixed"
+                | MuteResolution.AtTime -> "atTime"
+
+            let url = sprintf "/app/rest/mutes?locator=affectedProject:%s,resolution:%s,count:10000" affectedProject resType
+            let reply = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
+            getMuteInfo(reply)
 
         member this.UnMuteTest(conf:ITeamcityConfiguration, muteId:string) = 
             let url = sprintf "/app/rest/mutes/id:%s" muteId
@@ -1240,13 +1305,13 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                             builds.Add(newBuild)
             builds
 
-        member this.GetLastBuildsFromProject(conf:ITeamcityConfiguration, projectName:string, branch:string) =
+        member this.GetLastBuildsFromProject(conf:ITeamcityConfiguration, projectName:string, branch:string, isDefault:bool) =
 
             let urlToUse =
-                if branch = "" then
+                if branch = "" || isDefault then
                     sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)&fields=buildType(id,comment,name,builds($locator(branch:(default:true),count:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment,branchName)))" projectName
                 else
-                    sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)&fields=buildType(id,comment,name,builds($locator(branch:%s,count:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment,branchName)))" projectName branch
+                    sprintf "/app/rest/buildTypes?locator=affectedProject:(id:%s)&fields=buildType(id,comment,name,builds($locator(branch:(name:(matchType:equals,value:(%s))),count:1),build(id,startDate,finishDate,queuedDate,statusText,status,href,state,buildTypeId,webUrl,number,comment,branchName)))" projectName branch
 
             let dataS = httpconnector.HttpRequest(conf, urlToUse, RestSharp.Method.Get)
             let dataAnswer = dataS.Content
