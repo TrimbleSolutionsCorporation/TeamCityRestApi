@@ -11,4 +11,8 @@
     <AssemblyOriginatorKeyFile>..\AssemblyKey.snk</AssemblyOriginatorKeyFile>
     <PackageOutputPath>..\BuildDrop\</PackageOutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Remote.Linq.Newtonsoft.Json" Version="7.2.1" />
+  </ItemGroup>
 </Project>
