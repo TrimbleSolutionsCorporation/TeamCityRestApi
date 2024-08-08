@@ -1156,7 +1156,18 @@ type MuteResponse = JsonProvider<"""
   ]
 }
 """>
-
+type TeamCityBranches = JsonProvider<"""
+{
+  "count": 75,
+  "href": "/app/rest/buildTypes/id:Win32x64Features_TeklaStructuresX64Release/branches",
+  "branch": [
+    {"name": "Feature/TTSD-64026-adjust-reinforcing-bars-command-is-missing-from-quick-launch_2024"},
+    {"name": "Feature/TTSD-64026-adjust-reinforcing-bars-command-is-missing-from-quick-launch_references_adding"},
+    {"name": "bugfix/SOLD-2516_Switch_user_button_is_not_working_2023"},
+    {"name": "bugfix/SOLD-2516_Switch_user_button_is_not_working_2024"}
+  ]
+}
+""">
 type TestDetails = JsonProvider<"""
 {
     "id": "id:9797,build:(id:12676325)",

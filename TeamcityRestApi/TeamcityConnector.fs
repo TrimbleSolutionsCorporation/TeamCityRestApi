@@ -7,7 +7,6 @@ open TeamcityRestTypes
 open System.Globalization
 open System.IO
 open RestSharp
-open Newtonsoft.Json.Linq
 open RestSharp.Authenticators
 
 type MuteResolution = Automatic | Manual | AtTime
@@ -828,17 +827,16 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             let payload = sprintf """<builds><build id="%s"/></builds>""" buildid
             let requestDAta = httpconnector.HttpPutXmlContent(conf, url, payload)
             requestDAta.IsSuccessful
-        
+
         member this.GetBranchesFromTeamcityConfiguration(conf: ITeamcityConfiguration, buildTypeId: string) =
             let url = sprintf "app/rest/buildTypes/id:%s/branches" buildTypeId
             let content = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
-            let branches = new System.Collections.Generic.List<string>()
-    
+            let branches =  new System.Collections.Generic.List<string>()
+
             if not (String.IsNullOrWhiteSpace(content)) then
-                let jsonObject = JObject.Parse(content)
-                for branch in jsonObject.["branch"] do
-                    let name = branch.["name"].ToString()
-                    branches.Add(name)
+                let parsed = TeamCityBranches.Parse(content)
+                for branch in parsed.Branch do
+                    branches.Add(branch.Name)
             branches
 
         member this.EnableAgent(conf:ITeamcityConfiguration, id:string, reason:string) =
