@@ -11,4 +11,7 @@
     <AssemblyOriginatorKeyFile>..\AssemblyKey.snk</AssemblyOriginatorKeyFile>
     <PackageOutputPath>..\BuildDrop\</PackageOutputPath>
   </PropertyGroup>
+
+  <ItemGroup>
+  </ItemGroup>
 </Project>

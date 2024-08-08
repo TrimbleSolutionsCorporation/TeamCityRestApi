@@ -86,7 +86,9 @@ type ITeamcityConnector =
   abstract member CancelBuild : ConnectionConfiguration:ITeamcityConfiguration * buildUrl:string * readInToQueue:bool -> bool
   abstract member CancelBuild : ConnectionConfiguration:ITeamcityConfiguration * buildUrl:string * readInToQueue:bool * cancelingComment:string * cancelingApplication:string -> bool
   abstract member MoveBuildToTop : ConnectionConfiguration:ITeamcityConfiguration * buildid:string -> bool
-  
+  abstract member GetBranchesFromTeamcityConfiguration : ConnectionConfiguration:ITeamcityConfiguration* buildTypeId:string -> System.Collections.Generic.List<string>
+
+
   abstract member GetAllMutesInAffectedProject : ConnectionConfiguration:ITeamcityConfiguration * affectedProject:string * resolutionType:MuteResolution -> System.Collections.Generic.List<MuteDetails>
   abstract member MuteTest : ConnectionConfiguration:ITeamcityConfiguration * scopeId:string * reason:string * resolutionType:MuteResolution * testName:string -> bool
   abstract member UnMuteTest : ConnectionConfiguration:ITeamcityConfiguration * muteId:string -> string
@@ -825,6 +827,17 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
             let payload = sprintf """<builds><build id="%s"/></builds>""" buildid
             let requestDAta = httpconnector.HttpPutXmlContent(conf, url, payload)
             requestDAta.IsSuccessful
+
+        member this.GetBranchesFromTeamcityConfiguration(conf: ITeamcityConfiguration, buildTypeId: string) =
+            let url = sprintf "app/rest/buildTypes/id:%s/branches" buildTypeId
+            let content = httpconnector.HttpRequest(conf, url, RestSharp.Method.Get).Content
+            let branches =  new System.Collections.Generic.List<string>()
+
+            if not (String.IsNullOrWhiteSpace(content)) then
+                let parsed = TeamCityBranches.Parse(content)
+                for branch in parsed.Branch do
+                    branches.Add(branch.Name)
+            branches
 
         member this.EnableAgent(conf:ITeamcityConfiguration, id:string, reason:string) =
             let url = sprintf "/app/rest/agents/id:%s/enabledInfo" id
