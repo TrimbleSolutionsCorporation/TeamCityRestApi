@@ -21,9 +21,8 @@
   </ItemGroup>
   
   <ItemGroup>    
-    <PackageReference Update="FSharp.Core" Version="4.5.2" />
-    <PackageReference Include="FSharp.Data.Signed" Version="3.1.2" />
-    <PackageReference Include="Remote.Linq.Newtonsoft.Json" Version="7.2.1" />
+    <PackageReference Update="FSharp.Core" Version="8.0.301" />    
+    <PackageReference Include="FSharp.Data" Version="6.3.0" />
 	<PackageReference Include="RestSharp" Version="108.0.1" />
   </ItemGroup>
   <ItemGroup>
