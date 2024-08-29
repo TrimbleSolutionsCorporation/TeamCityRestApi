@@ -23,7 +23,7 @@
   <ItemGroup>    
     <PackageReference Update="FSharp.Core" Version="8.0.301" />    
     <PackageReference Include="FSharp.Data" Version="6.3.0" />
-	<PackageReference Include="RestSharp" Version="108.0.1" />
+	<PackageReference Include="RestSharp" Version="112.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TeamcityRestTypes\TeamcityRestTypes.csproj" />
