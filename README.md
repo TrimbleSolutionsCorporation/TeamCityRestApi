@@ -1,4 +1,4 @@
-# TeamcityRestConnector
+# TeamCityRestApi
 
 ## Overview
 
