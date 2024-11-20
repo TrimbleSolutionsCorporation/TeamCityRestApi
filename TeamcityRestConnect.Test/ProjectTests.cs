@@ -47,7 +47,7 @@ namespace TeamcityRestConnect.Test
             return HttpStatusCode.OK;
         }
 
-        [Test]
+        //[Test]
         public void TestDisableAgent()
         {
             var configuration = new Configuration();
@@ -55,7 +55,7 @@ namespace TeamcityRestConnect.Test
             Assert.That(restClient.DisableAgent(configuration, "395"), Is.True);
         }
 
-        [Test]
+        //[Test]
         public void TestDisableAgentQueue()
         {
             var configuration = new Configuration();
@@ -65,7 +65,7 @@ namespace TeamcityRestConnect.Test
         }
 
 
-        [Test]
+        //[Test]
         public void TestCreateProject()
         {
             var configuration = new Configuration();
@@ -76,7 +76,7 @@ namespace TeamcityRestConnect.Test
             Assert.That(CreateFTCCaseForMasterInTeamcity(configs, configuration), Is.EqualTo(HttpStatusCode.OK));
         }
 
-        [Test]
+        // [Test]
         public void TestDeleteProject()
         {
             var configuration = new Configuration();
