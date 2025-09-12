@@ -69,6 +69,7 @@ type JsonTeamcityConnector() =
             else
                 options.Authenticator <- new HttpBasicAuthenticator(userConf.Username, userConf.Password)
         else
+            options.CookieContainer <- new CookieContainer()
             options.CookieContainer.Add(new Cookie(sessionCookie.Name, sessionCookie.Value, sessionCookie.Path, sessionCookie.Domain))
 
         request.AddHeader("Origin", userConf.Hostname) |> ignore
