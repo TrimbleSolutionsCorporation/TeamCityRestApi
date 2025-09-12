@@ -646,7 +646,8 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
         let parameters = 
             if properties.Count <> 0 then
                 data <- """    <properties> """
-                properties |> Map.iter (fun key value -> data  <- data + (sprintf """        <property name="%s" value="%s"/> """ key value))
+                properties |> Map.map (fun _ value -> System.Security.SecurityElement.Escape(value))
+                    |> Map.iter (fun key value -> data  <- data + (sprintf """        <property name="%s" value="%s"/> """ key value))
                 data <- data + """    </properties> """
 
             data
