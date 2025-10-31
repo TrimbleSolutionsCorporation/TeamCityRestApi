@@ -633,7 +633,7 @@ type TeamcityConnector(httpconnector : IHttpTeamcityConnector) =
                 ""
         let revision = 
             if revision <> "" then
-                sprintf "<lastChanges><change locator=\"version:%s,buildType:(id:%s)\"/></lastChanges>" revision buildid
+                sprintf "<lastChanges><change locator=\"version:%s\"/></lastChanges>" revision
             else
                 ""
 
